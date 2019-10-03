@@ -60,6 +60,9 @@ class EdgarEzAuditLogRepository extends EntityRepository
             $qbFilterAudit->setParameter('audit_identifiers', $auditIdentifiers);
         }
 
+        $dateEnd = new \DateTime($data->getDateEnd());
+        $dateEnd->add(new \DateInterval('PT23H59M59S'));
+
         $queryBuilder = $entityManager->createQueryBuilder();
         $queryBuilder->select('l')
             ->from(EdgarEzAuditLog::class, 'l')
@@ -71,7 +74,7 @@ class EdgarEzAuditLogRepository extends EntityRepository
             ->orderBy('l.date', 'DESC')
             ->setParameter('audit_identifiers', $auditIdentifiers)
             ->setParameter('date_start', $data->getDateStart())
-            ->setParameter('date_end', $data->getDateEnd());
+            ->setParameter('date_end', $dateEnd->format('Y-m-d H:i:s'));
 
         return $queryBuilder;
     }

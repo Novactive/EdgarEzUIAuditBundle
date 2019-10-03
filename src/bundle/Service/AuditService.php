@@ -201,6 +201,14 @@ class AuditService
     }
 
     /**
+     * @return QueryBuilder
+     */
+    public function buildExportQueryForUser($userId): QueryBuilder
+    {
+        return $this->auditExport->buildExportQueryForUser($userId);
+    }
+
+    /**
      * @param ExportAuditData $data
      */
     public function saveExport(ExportAuditData $data)

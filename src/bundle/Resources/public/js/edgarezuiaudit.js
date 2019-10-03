@@ -27,3 +27,10 @@
     iconsAuditExportUp.forEach(icon => icon.addEventListener('click', exportUp, false));
     iconAuditExportDown.forEach(icon => icon.addEventListener('click', exportDown, false));
 })();
+
+jQuery(function($) {
+    $(document).on('click', '.delete-request', function () {
+        $('#audit-delete-request').modal('show');
+        $('.delete-log').attr('href', $(this).attr('data-content'));
+    });
+});

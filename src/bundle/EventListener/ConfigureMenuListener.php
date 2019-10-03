@@ -41,33 +41,36 @@ class ConfigureMenuListener implements TranslationContainerInterface
 
             $auditMenu = $menu->addChild(self::ITEM_AUDIT, []);
 
-            $this->addAuditMenuItems($auditMenu);
+            $this->addAuditMenuItemsOverrided($auditMenu);
         }
     }
 
     /**
-     * Add audit menu items.
-     *
      * @param ItemInterface $auditMenu
+     *
+     * @throws \eZ\Publish\API\Repository\Exceptions\InvalidArgumentException
      */
-    private function addAuditMenuItems(ItemInterface $auditMenu)
+    public function addAuditMenuItemsOverrided(ItemInterface $auditMenu)
     {
         $menuItems = [];
-
-        $menuItems[self::ITEM_AUDIT_DASHBOARD] = $auditMenu->addChild(
-            self::ITEM_AUDIT_DASHBOARD,
-            ['route' => 'edgar.audit.dashboard']
-        );
-
-        $menuItems[self::ITEM_AUDIT_CONFIGURE] = $auditMenu->addChild(
-            self::ITEM_AUDIT_CONFIGURE,
-            ['route' => 'edgar.audit.configure']
-        );
-
-        $menuItems[self::ITEM_AUDIT_EXPORT] = $auditMenu->addChild(
-            self::ITEM_AUDIT_EXPORT,
-            ['route' => 'edgar.audit.export']
-        );
+        if ($this->permissionResolver->hasAccess('uiaudit', 'dashboard')) {
+            $menuItems[self::ITEM_AUDIT_DASHBOARD] = $auditMenu->addChild(
+                self::ITEM_AUDIT_DASHBOARD,
+                ['route' => 'edgar.audit.dashboard']
+            );
+        }
+        if ($this->permissionResolver->hasAccess('uiaudit', 'configure')) {
+            $menuItems[self::ITEM_AUDIT_CONFIGURE] = $auditMenu->addChild(
+                self::ITEM_AUDIT_CONFIGURE,
+                ['route' => 'edgar.audit.configure']
+            );
+        }
+        if ($this->permissionResolver->hasAccess('uiaudit', 'export')) {
+            $menuItems[self::ITEM_AUDIT_EXPORT] = $auditMenu->addChild(
+                self::ITEM_AUDIT_EXPORT,
+                ['route' => 'edgar.audit.export']
+            );
+        }
     }
 
     /**

@@ -35,6 +35,22 @@ class EdgarEzAuditExportRepository extends EntityRepository
     }
 
     /**
+     * @return QueryBuilder
+     */
+    public function buildExportQueryForUser($userId): QueryBuilder
+    {
+        $entityManager = $this->getEntityManager();
+        $queryBuilder  = $entityManager->createQueryBuilder();
+        $queryBuilder->select('e')
+            ->from(EdgarEzAuditExport::class, 'e')
+            ->where($queryBuilder->expr()->eq('e.userId', ':userId'))
+            ->orderBy('e.date', 'DESC')
+            ->setParameter('userId', $userId);
+
+        return $queryBuilder;
+    }
+
+    /**
      * @param ExportAuditData $data
      * @param int $userId
      *
@@ -74,29 +90,52 @@ class EdgarEzAuditExportRepository extends EntityRepository
             ->from(EdgarEzAuditExport::class, 'e')
             ->orderBy('e.date', 'DESC')
             ->where($queryBuilder->expr()->eq('e.status', ':status'))
-            ->setMaxResults(1)
             ->setParameter('status', self::STATUS_INIT)
             ->getQuery();
 
         try {
             /** @var EdgarEzAuditExport $export */
-            $export = $query->getOneOrNullResult();
+            $exports = $query->getResult();
         } catch (NonUniqueResultException $e) {
             return null;
         }
 
-        if ($export) {
-            try {
+        if (count($exports) > 0) {
+            foreach ($exports as $export) {
                 $export->setStatus(self::STATUS_PROGRESS);
                 $entityManager->persist($export);
                 $entityManager->flush();
-            } catch (ORMException $e) {
-                return null;
             }
 
-            return $export;
+            return $exports;
         }
 
+        return null;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function startExportAll(): ?array
+    {
+        $entityManager = $this->getEntityManager();
+        $queryBuilder = $entityManager->createQueryBuilder();
+        $query        = $queryBuilder->select('e')
+            ->from(EdgarEzAuditExport::class, 'e')
+            ->orderBy('e.date', 'DESC')
+            ->where($queryBuilder->expr()->eq('e.status', ':status'))
+            ->setParameter('status', self::STATUS_INIT)
+            ->getQuery();
+        /** @var EdgarEzAuditExport $export */
+        $exports = $query->getResult();
+        if (count($exports) > 0) {
+            foreach ($exports as $export) {
+                $export->setStatus(self::STATUS_PROGRESS);
+                $entityManager->persist($export);
+                $entityManager->flush();
+            }
+            return $exports;
+        }
         return null;
     }
 

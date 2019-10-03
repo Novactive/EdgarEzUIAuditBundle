@@ -74,12 +74,16 @@ class AuditExportController extends BaseController
      */
     public function exportAction(Request $request): Response
     {
+        $repository = $this->container->get('ezpublish.api.repository');
         $this->permissionAccess('uiaudit', 'export');
-
-        $limit = $request->get('limit', 10);
-        $page = $request->get('page', 1);
-
-        $query = $this->auditService->buildExportQuery();
+        $limit        = $request->get('limit', 10);
+        $page         = $request->get('page', 1);
+        $hasAllAccess = $repository->hasAccess('uiaudit', 'configure', $repository->getCurrentUser());
+        if ($hasAllAccess) {
+            $query = $this->auditService->buildExportQuery();
+        } else {
+            $query = $this->auditService->buildExportQueryForUser($repository->getCurrentUser()->id);
+        }
         $pagerfanta = new Pagerfanta(
             new DoctrineORMAdapter($query)
         );
@@ -89,7 +93,7 @@ class AuditExportController extends BaseController
 
         return $this->render('@EdgarEzUIAudit/audit/export.html.twig', [
             'exports' => $this->pagerContentToExportMapper->map($pagerfanta),
-            'pager' => $pagerfanta,
+            'pager'   => $pagerfanta,
         ]);
     }
 
@@ -122,6 +126,39 @@ class AuditExportController extends BaseController
         }
 
         return new RedirectResponse($this->generateUrl('edgar.audit.export', []));
+    }
+
+    /**
+     * @return RedirectResponse
+     */
+    public function exportNowAction(): RedirectResponse
+    {
+        try {
+            exec('php ../bin/console edgarez:export:all', $output, $return_var);
+
+            return new RedirectResponse($this->generateUrl('edgar.audit.export', []));
+        } catch (\Exception $exception) {
+            return new RedirectResponse($this->generateUrl('edgar.audit.export', ['error' => $exception->getMessage()]));
+        }
+    }
+
+    /**
+     * @param $id
+     * @return mixed
+     */
+    public function deleteLogAction($id)
+    {
+        try {
+            $em              = $this->getDoctrine()->getManager();
+            $auditExport     = $em->getRepository(EdgarEzAuditExport::class);
+            $requestToDelete = $auditExport->find($id);
+            $em->remove($requestToDelete);
+            $em->flush();
+
+            return $this->redirectToRoute('edgar.audit.export');
+        } catch (\Exception $exception) {
+            return $this->redirectToRoute('edgar.audit.export', ['error' => $exception->getMessage()]);
+        }
     }
 
     /**
