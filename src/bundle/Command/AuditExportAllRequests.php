@@ -97,7 +97,7 @@ class AuditExportAllRequests extends AbstractCron
                 $exportDir = $this->kernelRootDir.'/../web/'.$this->varDir.'/'.$this->storageDir.'/'.self::EXPORT_DIR;
                 if (!is_dir($exportDir)) {
                     if (!@mkdir($exportDir, 0777, true)) {
-                        $output->writeln('Fial to create export directory');
+                        $output->writeln('Fail to create export directory');
                         try {
                             $this->exportRepository->setStatus($export, EdgarRepository::STATUS_KO);
                         } catch (ORMException $e) {

@@ -33,7 +33,7 @@ class ExportAuditData
 
         if ($date_end) {
             $dateEnd = new \DateTime($date_end);
-            $this->date_end = $dateEnd->getTimestamp();
+            $this->date_end = $dateEnd->add(new \DateInterval('PT23H59M59S'))->getTimestamp();
         }
     }
 

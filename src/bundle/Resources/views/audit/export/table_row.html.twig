@@ -1,3 +1,5 @@
+{% trans_default_domain 'edgarezuiaudit' %}
+
 <tr style="display:none;">
     <th>{{ 'export.audits'|trans|desc('Audits') }}</th>
     <td colspan="7">
@@ -11,23 +13,25 @@
 <tr>
     <td>{{ row.user_id }}</td>
     <td>{{ row.user_name }}</td>
-    <td>{{ row.date_start|localizeddate('short', 'short', app.request.locale) }}</td>
-    <td>{{ row.date_end|localizeddate('short', 'short', app.request.locale) }}</td>
-    <td>{{ row.date|localizeddate('short', 'short', app.request.locale) }}</td>
+    <td>{{ row.date_start|localizeddate('short', 'none', app.request.locale) }}</td>
+    <td>{{ row.date_end|localizeddate('short', 'none', app.request.locale) }}</td>
+    <td>{{ row.date|localizeddate('short', 'none', app.request.locale) }}</td>
     <td>{{ row.status }}</td>
     <td>
         {% if row.file is not empty %}
             <a href="{{ path('edgar.audit.export.download', {'exportId': row.id, 'filename': row.file}) }}">
-                {{ 'export.download'|trans|desc('Download') }}
+                {{ 'export.download'|trans }}
             </a>
         {% endif %}
     </td>
     <td>
-        <div class="c-action-btn c-action-btn--trash delete-request" title="Delete selected items" tabindex="-1" data-content="{{ path('edgar.audit.delete.log',{'id' : row.id}) }}">
-            <svg class="ez-icon ez-icon--light ez-icon--medium">
-                <use xlink:href="/bundles/ezplatformadminui/img/ez-icons.svg#trash"></use>
-            </svg>
-        </div>
+        {% if row.status != "OK" %}
+            <div class="c-action-btn c-action-btn--trash delete-request" title="Delete selected items" tabindex="-1" data-content="{{ path('edgar.audit.delete.log',{'id' : row.id}) }}">
+                <svg class="ez-icon ez-icon--light ez-icon--medium">
+                    <use xlink:href="/bundles/ezplatformadminui/img/ez-icons.svg#trash"></use>
+                </svg>
+            </div>
+        {% endif %}
     </td>
     <td>
         <a href="#" class="audit-export audit-export-up">

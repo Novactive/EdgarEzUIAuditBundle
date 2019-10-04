@@ -1,3 +1,5 @@
+{% trans_default_domain 'edgarezuiaudit' %}
+
 <div class="m-sub-items__bulk-delete-modal-container">
     <div class="c-popup modal c-popup--no-header show" id="audit-delete-request" tabindex="-1" aria-modal="true">
         <div class="modal-dialog c-popup__dialog " role="dialog">
@@ -10,14 +12,14 @@
                     </button>
                 </div>
                 <div class="modal-body c-popup__body">
-                    <div class="m-sub-items__confirmation-modal-body">{{ 'ask.to.delete'|trans|desc('Are you sure you want to delete this request ?') }}
+                    <div class="m-sub-items__confirmation-modal-body">{{ 'ask.to_delete'|trans }}
                     </div>
                 </div>
                 <div class="modal-footer c-popup__footer">
                     <button type="button" class="btn btn-secondary btn--no m-sub-items__confirmation-modal-cancel-btn"
                             data-dismiss="modal">{{ 'cancel'|trans|desc('Cancel') }}
                     </button>
-                    <a href="" class="btn btn-danger font-weight-bold delete-log">{{ 'delete'|trans|desc('Delete it') }}</a>
+                    <a href="" class="btn btn-danger font-weight-bold delete-log">{{ 'delete'|trans }}</a>
                 </div>
             </div>
         </div>
