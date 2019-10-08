@@ -84,7 +84,7 @@ class AuditExportController extends BaseController
         $this->permissionAccess('uiaudit', 'export');
         $limit        = $request->get('limit', 10);
         $page         = $request->get('page', 1);
-        $hasAllAccess = $repository->hasAccess('uiaudit', 'configure', $repository->getCurrentUser());
+        $hasAllAccess = $this->permissionResolver->hasAccess('uiaudit', 'configure', $repository->getCurrentUser());
         if ($hasAllAccess) {
             $query = $this->auditService->buildExportQuery();
         } else {
