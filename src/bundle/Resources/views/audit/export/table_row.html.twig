@@ -20,7 +20,7 @@
     <td>
         {% if row.file is not empty %}
             <a href="{{ path('edgar.audit.export.download', {'exportId': row.id, 'filename': row.file}) }}">
-                {{ 'export.download'|trans }}
+                {{ 'export.download'|trans|desc('Download') }}
             </a>
         {% endif %}
     </td>

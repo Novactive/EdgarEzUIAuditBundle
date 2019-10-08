@@ -128,15 +128,8 @@ class EdgarEzAuditExportRepository extends EntityRepository
             ->getQuery();
         /** @var EdgarEzAuditExport $export */
         $exports = $query->getResult();
-        if (count($exports) > 0) {
-            foreach ($exports as $export) {
-                $export->setStatus(self::STATUS_PROGRESS);
-                $entityManager->persist($export);
-                $entityManager->flush();
-            }
-            return $exports;
-        }
-        return null;
+
+        return $exports;
     }
 
     /**

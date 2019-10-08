@@ -17,6 +17,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\TranslatorInterface;
+use Psr\Log\LoggerInterface;
 
 class AuditExportController extends BaseController
 {
@@ -31,6 +32,9 @@ class AuditExportController extends BaseController
 
     protected $exportRepository;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     /**
      * AuditExportController constructor.
      *
@@ -41,6 +45,7 @@ class AuditExportController extends BaseController
      * @param PagerContentToExportMapper $pagerContentToExportMapper
      * @param ExportFormFactory $exportFormFactory
      * @param SubmitHandler $submitHandler
+     * @param LoggerInterface $logger
      */
     public function __construct(
         AuditService $auditService,
@@ -50,7 +55,8 @@ class AuditExportController extends BaseController
         PagerContentToExportMapper $pagerContentToExportMapper,
         ExportFormFactory $exportFormFactory,
         SubmitHandler $submitHandler,
-        Registry $doctrineRegistry
+        Registry $doctrineRegistry,
+        LoggerInterface $logger
     ) {
         parent::__construct($auditService, $permissionResolver, $notificationHandler, $translator);
         $this->auditService = $auditService;
@@ -60,7 +66,7 @@ class AuditExportController extends BaseController
         $this->pagerContentToExportMapper = $pagerContentToExportMapper;
         $this->exportFormFactory = $exportFormFactory;
         $this->submitHandler = $submitHandler;
-
+        $this->logger = $logger;
         $entityManager = $doctrineRegistry->getEntityManager();
         $this->exportRepository = $entityManager->getRepository(EdgarEzAuditExport::class);
     }
@@ -134,9 +140,14 @@ class AuditExportController extends BaseController
     public function exportNowAction(): RedirectResponse
     {
         try {
-            exec('php ../bin/console edgarez:export:all', $output, $return_var);
+            if (file_exists('../bin/console')) {
+                exec('php -d memory_limit=-1 ../bin/console edgarez:export:all', $output, $return_var);
+            } else {
+                $this->logger->error('File does not exist');
+            }
 
             return new RedirectResponse($this->generateUrl('edgar.audit.export', []));
+
         } catch (\Exception $exception) {
             return new RedirectResponse($this->generateUrl('edgar.audit.export', ['error' => $exception->getMessage()]));
         }

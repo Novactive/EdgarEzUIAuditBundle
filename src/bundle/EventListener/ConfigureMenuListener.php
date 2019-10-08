@@ -41,7 +41,7 @@ class ConfigureMenuListener implements TranslationContainerInterface
 
             $auditMenu = $menu->addChild(self::ITEM_AUDIT, []);
 
-            $this->addAuditMenuItemsOverrided($auditMenu);
+            $this->addAuditMenuItems($auditMenu);
         }
     }
 
@@ -50,7 +50,7 @@ class ConfigureMenuListener implements TranslationContainerInterface
      *
      * @throws \eZ\Publish\API\Repository\Exceptions\InvalidArgumentException
      */
-    public function addAuditMenuItemsOverrided(ItemInterface $auditMenu)
+    public function addAuditMenuItems(ItemInterface $auditMenu)
     {
         $menuItems = [];
         if ($this->permissionResolver->hasAccess('uiaudit', 'dashboard')) {

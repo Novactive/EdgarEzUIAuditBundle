@@ -22,7 +22,7 @@
     <section class="container mt-4">
 
         <div class="ez-table-header mt-3">
-            <h5>{{ 'export.header'|trans({'%total%': pager.nbResults}) }}</h5>
+            <h5>{{ 'export.header'|trans({'%total%': pager.nbResults})|desc('Export results (%total%)') }}</h5>
             {% set statusInit = false %}
             {% for export in exports %}
                 {% if export['status'] == 'Init'%}
@@ -32,7 +32,7 @@
             <form action="{{ path('edgar.audit.export.now') }}">
                 <span class="input-group-btn">
                     <button type="submit" class="btn btn-primary" {{ pager.nbResults == 0 or not statusInit ? 'disabled' }}>
-                    {{ 'export.now'|trans }}
+                    {{ 'export.now'|trans|desc('Export now') }}
                     </button>
                 </span>
             </form>
