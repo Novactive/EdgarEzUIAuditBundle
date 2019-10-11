@@ -159,7 +159,7 @@ class AuditExportController extends BaseController
             $application = new Application($this->kernel);
             $application->setAutoExit(false);
             $input = new ArrayInput([
-                'command' => 'edgarez:exportq:all',
+                'command' => 'edgarez:export:all',
                 '-d memory_limit' => '-1',
             ]);
             $output = new BufferedOutput();

@@ -37,3 +37,6 @@ services:
           $storageDir: "$storage_dir$"
         tags:
         - { name: "edgar.export.all", alias: "audit_export_all", priority: -999, expression: "*/5 * * * *" }
+
+    Edgar\EzUIAudit\Form\Mapper\PagerContentToExportMapper:
+        arguments: ["@ezpublish.api.service.user","@translator.default"]
