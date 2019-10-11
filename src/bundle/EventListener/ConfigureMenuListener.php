@@ -50,7 +50,7 @@ class ConfigureMenuListener implements TranslationContainerInterface
      *
      * @throws \eZ\Publish\API\Repository\Exceptions\InvalidArgumentException
      */
-    public function addAuditMenuItems(ItemInterface $auditMenu)
+    private function addAuditMenuItems(ItemInterface $auditMenu)
     {
         $menuItems = [];
         if ($this->permissionResolver->hasAccess('uiaudit', 'dashboard')) {

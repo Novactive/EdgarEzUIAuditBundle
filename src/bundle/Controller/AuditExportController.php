@@ -10,6 +10,7 @@ use Edgar\EzUIAudit\Form\SubmitHandler;
 use Edgar\EzUIAuditBundle\Entity\EdgarEzAuditExport;
 use Edgar\EzUIAuditBundle\Service\AuditService;
 use eZ\Publish\API\Repository\PermissionResolver;
+use eZ\Publish\Core\Repository\SiteAccessAware\Repository;
 use EzSystems\EzPlatformAdminUi\Notification\NotificationHandlerInterface;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;
@@ -18,6 +19,10 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Translation\TranslatorInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 class AuditExportController extends BaseController
 {
@@ -35,6 +40,12 @@ class AuditExportController extends BaseController
     /** @var LoggerInterface */
     protected $logger;
 
+    /** @var Repository */
+    protected $repository;
+
+    /** @var KernelInterface */
+    protected $kernel;
+
     /**
      * AuditExportController constructor.
      *
@@ -46,6 +57,8 @@ class AuditExportController extends BaseController
      * @param ExportFormFactory $exportFormFactory
      * @param SubmitHandler $submitHandler
      * @param LoggerInterface $logger
+     * @param Repository $repository
+     * @param KernelInterface $kernel
      */
     public function __construct(
         AuditService $auditService,
@@ -56,19 +69,23 @@ class AuditExportController extends BaseController
         ExportFormFactory $exportFormFactory,
         SubmitHandler $submitHandler,
         Registry $doctrineRegistry,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        Repository $repository,
+        KernelInterface $kernel
     ) {
         parent::__construct($auditService, $permissionResolver, $notificationHandler, $translator);
-        $this->auditService = $auditService;
-        $this->permissionResolver = $permissionResolver;
-        $this->notificationHandler = $notificationHandler;
-        $this->translator = $translator;
+        $this->auditService               = $auditService;
+        $this->permissionResolver         = $permissionResolver;
+        $this->notificationHandler        = $notificationHandler;
+        $this->translator                 = $translator;
         $this->pagerContentToExportMapper = $pagerContentToExportMapper;
-        $this->exportFormFactory = $exportFormFactory;
-        $this->submitHandler = $submitHandler;
-        $this->logger = $logger;
-        $entityManager = $doctrineRegistry->getEntityManager();
-        $this->exportRepository = $entityManager->getRepository(EdgarEzAuditExport::class);
+        $this->exportFormFactory          = $exportFormFactory;
+        $this->submitHandler              = $submitHandler;
+        $this->logger                     = $logger;
+        $entityManager                    = $doctrineRegistry->getEntityManager();
+        $this->exportRepository           = $entityManager->getRepository(EdgarEzAuditExport::class);
+        $this->repository                 = $repository;
+        $this->kernel                     = $kernel;
     }
 
     /**
@@ -80,15 +97,14 @@ class AuditExportController extends BaseController
      */
     public function exportAction(Request $request): Response
     {
-        $repository = $this->container->get('ezpublish.api.repository');
         $this->permissionAccess('uiaudit', 'export');
         $limit        = $request->get('limit', 10);
         $page         = $request->get('page', 1);
-        $hasAllAccess = $this->permissionResolver->hasAccess('uiaudit', 'configure', $repository->getCurrentUser());
+        $hasAllAccess = $this->permissionResolver->hasAccess('uiaudit', 'configure', $this->repository->getCurrentUser());
         if ($hasAllAccess) {
             $query = $this->auditService->buildExportQuery();
         } else {
-            $query = $this->auditService->buildExportQueryForUser($repository->getCurrentUser()->id);
+            $query = $this->auditService->buildExportQueryForUser($this->repository->getCurrentUser()->id);
         }
         $pagerfanta = new Pagerfanta(
             new DoctrineORMAdapter($query)
@@ -140,10 +156,16 @@ class AuditExportController extends BaseController
     public function exportNowAction(): RedirectResponse
     {
         try {
-            if (file_exists('../bin/console')) {
-                exec('php -d memory_limit=-1 ../bin/console edgarez:export:all', $output, $return_var);
-            } else {
-                $this->logger->error('File does not exist');
+            $application = new Application($this->kernel);
+            $application->setAutoExit(false);
+            $input = new ArrayInput([
+                'command' => 'edgarez:exportq:all',
+                '-d memory_limit' => '-1',
+            ]);
+            $output = new BufferedOutput();
+            $application->run($input, $output);
+            if ($output) {
+                $this->logger->error($output->fetch());
             }
 
             return new RedirectResponse($this->generateUrl('edgar.audit.export', []));
