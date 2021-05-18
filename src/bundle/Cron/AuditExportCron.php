@@ -2,7 +2,7 @@
 
 namespace Edgar\EzUIAuditBundle\Cron;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Internal\Hydration\IterableResult;
 use Doctrine\ORM\ORMException;
 use Edgar\Cron\Cron\AbstractCron;
@@ -39,7 +39,7 @@ class AuditExportCron extends AbstractCron
      * AuditExportCron constructor.
      *
      * @param null|string $name
-     * @param EntityManager $entityManager
+     * @param EntityManagerInterface $entityManager
      * @param AuditService $auditService
      * @param string $kernelRootDir
      * @param string $varDir
@@ -47,7 +47,7 @@ class AuditExportCron extends AbstractCron
      */
     public function __construct(
         ?string $name = null,
-        EntityManager $entityManager,
+        EntityManagerInterface $entityManager,
         AuditService $auditService,
         string $kernelRootDir,
         string $varDir,
