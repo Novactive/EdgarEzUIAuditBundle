@@ -25,3 +25,13 @@ edgar.audit.export.download:
         _controller: 'EdgarEzUIAuditBundle:AuditExport:download'
     requirements:
         exportId: \d+
+
+edgar.audit.delete.log:
+    path: /audit/delete-log/{id}
+    defaults:
+        _controller: 'EdgarEzUIAuditBundle:AuditExport:deleteLog'
+
+edgar.audit.export.now:
+    path: /audit/export/now
+    defaults:
+        _controller: 'EdgarEzUIAuditBundle:AuditExport:exportNow'

@@ -15,8 +15,8 @@ class ExportAuditData
 
     public function __construct(
         ?array $audit_types = null,
-        ?\DateTime $date_start = null,
-        ?\DateTime $date_end = null
+        ?string $date_start = null,
+        ?string $date_end = null
     ) {
         $audits = [];
         if ($audit_types) {
@@ -27,11 +27,13 @@ class ExportAuditData
         $this->audit_types = implode(',', $audits);
 
         if ($date_start) {
-            $this->date_start = $date_start->getTimestamp();
+            $dateStart = new \DateTime($date_start);
+            $this->date_start = $dateStart->getTimestamp();
         }
 
         if ($date_end) {
-            $this->date_end = $date_end->getTimestamp();
+            $dateEnd = new \DateTime($date_end);
+            $this->date_end = $dateEnd->add(new \DateInterval('PT23H59M59S'))->getTimestamp();
         }
     }
 

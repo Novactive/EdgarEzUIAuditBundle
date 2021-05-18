@@ -23,6 +23,19 @@
 
         <div class="ez-table-header mt-3">
             <h5>{{ 'export.header'|trans({'%total%': pager.nbResults})|desc('Export results (%total%)') }}</h5>
+            {% set statusInit = false %}
+            {% for export in exports %}
+                {% if export['status'] == 'Init'%}
+                    {% set statusInit = true %}
+                {% endif %}
+            {% endfor %}
+            <form action="{{ path('edgar.audit.export.now') }}">
+                <span class="input-group-btn">
+                    <button type="submit" class="btn btn-primary" {{ pager.nbResults == 0 or not statusInit ? 'disabled' }}>
+                    {{ 'export.now'|trans|desc('Export now') }}
+                    </button>
+                </span>
+            </form>
         </div>
 
         {% if exports is empty %}
@@ -63,6 +76,7 @@
             {% endif %}
         {% endif %}
     </section>
+    {% include '@EdgarEzUIAudit/audit/export/audit-modal.html.twig' %}
 {% endblock %}
 
 {% block javascripts %}

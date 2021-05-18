@@ -87,8 +87,9 @@ class AuditDashboardController extends BaseController
     {
         $this->permissionAccess('uiaudit', 'dashboard');
 
+        $date = new \DateTime();
         $filterAuditType = $this->formFactory->filterAudit(
-            new FilterAuditData()
+            new FilterAuditData(10, 1, [], $date->format('Y-m-d'), $date->format('Y-m-d'))
         );
         $filterAuditType->handleRequest($request);
         $filterAuditType->getData()->setPage($request->get('page', 1));
@@ -117,8 +118,8 @@ class AuditDashboardController extends BaseController
                 return $this->render('@EdgarEzUIAudit/audit/dashboard.html.twig', [
                     'form_filter_audit' => $filterAuditType->createView(),
                     'form_export_audit' => $exportAuditType->createView(),
-                    'results' => $this->pagerContentToLogMapper->map($pagerfanta),
-                    'pager' => $pagerfanta,
+                    'results'           => $this->pagerContentToLogMapper->map($pagerfanta),
+                    'pager'             => $pagerfanta,
                 ]);
             });
 

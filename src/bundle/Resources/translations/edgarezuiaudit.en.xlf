@@ -106,6 +106,31 @@
         <target>Export results (%total%)</target>
         <note>key: export.header</note>
       </trans-unit>
+      <trans-unit id="0cba43dd0934baee7d01cca113580f1ebc3590e9" resname="export.now">
+        <source>Export now</source>
+        <target>Export now</target>
+        <note>key: export.now</note>
+      </trans-unit>
+      <trans-unit id="0cba43dd0934baee7d01cca113580f1ebc3590f0" resname="ask.to_delete">
+        <source>Are you sure you want to delete this request ?</source>
+        <target>Are you sure you want to delete this request ?</target>
+        <note>key: ask.to_delete</note>
+      </trans-unit>
+      <trans-unit id="0cba43dd0934baee7d01cca113580f1ebc3590f1" resname="cancel">
+        <source>Cancel</source>
+        <target>Cancel</target>
+        <note>key: cancel</note>
+      </trans-unit>
+      <trans-unit id="0cba43dd0934baee7d01cca113580f1ebc3590f2" resname="delete">
+        <source>Delete it</source>
+        <target>Delete it</target>
+        <note>key: delete</note>
+      </trans-unit>
+      <trans-unit id="0cba43dd0934baee7d01cca113580f1ebcxx90f3" resname="export.download">
+        <source>Download</source>
+        <target>Download</target>
+        <note>key: export.download</note>
+      </trans-unit>
       <trans-unit id="5a3964bdd21056624f6b23df64abc76d71c24e2c" resname="export.no_result">
         <source>Sorry, no export were found.</source>
         <target>Sorry, no export were found.</target>

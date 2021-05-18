@@ -173,11 +173,11 @@ class AuditService
      */
     public function log(AuditInterface $audit)
     {
-        $user = $this->tokenStorage->getToken()->getUser();
-        $apiUser = $user->getAPIUser();
+        $user = $this->tokenStorage->getToken()->getUser() ?? null;
+        $apiUser = $user->getAPIUser() ?? null;
 
         try {
-            $this->auditLog->log($apiUser->id, $audit->getGroup(), $audit->getIdentifier(), $audit->getName(), $audit->getInfos());
+            $this->auditLog->log($apiUser->id ?? 0, $audit->getGroup(), $audit->getIdentifier(), $audit->getName(), $audit->getInfos());
         } catch (ORMException $e) {
         }
     }
@@ -198,6 +198,14 @@ class AuditService
     public function buildExportQuery(): QueryBuilder
     {
         return $this->auditExport->buildQuery();
+    }
+
+    /**
+     * @return QueryBuilder
+     */
+    public function buildExportQueryForUser($userId): QueryBuilder
+    {
+        return $this->auditExport->buildExportQueryForUser($userId);
     }
 
     /**

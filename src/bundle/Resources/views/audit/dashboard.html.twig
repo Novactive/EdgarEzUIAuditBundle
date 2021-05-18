@@ -49,7 +49,9 @@
                             {{ form_label(form_filter_audit.date_start) }}
                         </td>
                         <td>
-                            {{ form_widget(form_filter_audit.date_start) }}
+                            <div class="flatpickr">
+                                {{ form_widget(form_filter_audit.date_start) }}
+                            </div>
                         </td>
                     </tr>
                     <tr>
@@ -57,7 +59,9 @@
                             {{ form_label(form_filter_audit.date_end) }}
                         </td>
                         <td>
-                            {{ form_widget(form_filter_audit.date_end) }}
+                            <div class="flatpickr">
+                                {{ form_widget(form_filter_audit.date_end) }}
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -118,4 +122,11 @@
         {% endif %}
     </section>
 
+{% endblock %}
+{% block javascripts %}
+    {%  javascripts
+        '@EdgarEzUIAuditBundle/Resources/public/js/edgardashboard.js'
+    %}
+        <script type="text/javascript" src="{{ asset_url }}"></script>
+    {% endjavascripts %}
 {% endblock %}
