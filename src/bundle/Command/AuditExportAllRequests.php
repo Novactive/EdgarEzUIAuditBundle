@@ -100,7 +100,7 @@ class AuditExportAllRequests extends AbstractCron
                     if (!@mkdir($exportDir, 0777, true)) {
                         $output->writeln('Fail to create export directory');
                         try {
-                            $this->exportRepository->setStatus($export, EdgarRepository::STATUS_KO);
+                            $this->exportRepository->setStatus($export, EdgarEzAuditExportRepository::STATUS_KO);
                         } catch (ORMException $e) {
                             $output->writeln('Fail to create export directory');
                         }
@@ -118,7 +118,7 @@ class AuditExportAllRequests extends AbstractCron
                 } catch (ORMException $e) {
                     $output->writeln('Fail to export audit: '.$e->getMessage());
                     try {
-                        $this->exportRepository->setStatus($export, EdgarRepository::STATUS_KO);
+                        $this->exportRepository->setStatus($export, EdgarEzAuditExportRepository::STATUS_KO);
                     } catch (ORMException $e) {
                         $output->writeln('Fail to export audit: '.$e->getMessage());
                     }
