@@ -29,22 +29,22 @@ class AuditExportAllRequests extends AbstractCron
     private $storageDir;
     /** @var EntityManagerInterface */
     private $em;
+
     /**
-     * AuditExportCron constructor.
-     *
-     * @param string|null   $name
-     * @param AuditService  $auditService
-     * @param string        $kernelRootDir
-     * @param string        $varDir
-     * @param string        $storageDir
+     * @param AuditService $auditService
+     * @param string $kernelRootDir
+     * @param string $varDir
+     * @param string $storageDir
+     * @param EntityManagerInterface $em
+     * @param $name
      */
     public function __construct(
-        ?string $name = null,
         AuditService $auditService,
         string $kernelRootDir,
         string $varDir,
         string $storageDir,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        $name = null
     ) {
         parent::__construct($name);
         $this->em               = $em;

@@ -32,10 +32,10 @@ services:
 
     Edgar\EzUIAuditBundle\Command\AuditExportAllRequests:
         arguments:
-            $name: null
             $kernelRootDir: "%kernel.project_dir%"
             $varDir: "$var_dir;ezsettings$"
             $storageDir: "$storage_dir$"
+            $name: null
         tags:
             - { name: "edgar.export.all", alias: "audit_export_all", priority: -999, expression: "*/5 * * * *" }
 
