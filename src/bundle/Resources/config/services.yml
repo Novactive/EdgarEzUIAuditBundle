@@ -30,13 +30,14 @@ services:
 
     Edgar\EzUIAudit\Form\Type\AuditTypeChoiceType: ~
 
-#    Edgar\EzUIAuditBundle\Command\AuditExportAllRequests:
-#        arguments:
-#            $kernelRootDir: "%kernel.project_dir%"
-#            $varDir: "$var_dir;ezsettings$"
-#            $storageDir: "$storage_dir$"
-#        tags:
-#            - { name: "edgar.export.all", alias: "audit_export_all", priority: -999, expression: "*/5 * * * *" }
+    Edgar\EzUIAuditBundle\Command\AuditExportAllRequests:
+        arguments:
+            $name: null
+            $kernelRootDir: "%kernel.project_dir%"
+            $varDir: "$var_dir;ezsettings$"
+            $storageDir: "$storage_dir$"
+        tags:
+            - { name: "edgar.export.all", alias: "audit_export_all", priority: -999, expression: "*/5 * * * *" }
 
     Edgar\EzUIAudit\Form\Factory\ConfigureFormFactory:
         public: true

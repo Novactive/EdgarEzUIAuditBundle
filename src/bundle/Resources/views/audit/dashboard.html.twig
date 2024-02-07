@@ -45,28 +45,28 @@
         {% endset %}
 
         {% set date_end_label %}
-            <div class="flatpickr">
-                {{ form_label(form_filter_audit.date_end) }}
-            </div>
+            {{ form_label(form_filter_audit.date_end) }}
         {% endset %}
 
         {% set date_end %}
-            {{ form_widget(form_filter_audit.date_end) }}
+            <div class="flatpickr">
+                {{ form_widget(form_filter_audit.date_end) }}
+            </div>
         {% endset %}
 
         {% set body_rows = body_rows|merge([{ cols: [
-            { content: date_start_label },
             { content: date_start },
+            { content: date_end },
         ] },
-            { cols: [
-                { content: date_end_label },
-                { content: date_end },
-            ] }
         ]) %}
         {% include '@ibexadesign/ui/component/table/table.html.twig' with {
             class: 'edgar-table-dash',
             headline:  'Additional filters'|trans ,
             body_rows,
+            head_cols: [
+                { content: date_start_label  },
+                { content: date_end_label },
+            ],
         } %}
         {{ form_end(form_filter_audit) }}
         <div>
