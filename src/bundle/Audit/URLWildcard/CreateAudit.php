@@ -3,20 +3,25 @@
 namespace Edgar\EzUIAuditBundle\Audit\URLWildcard;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\URLWildcard\CreateEvent;
 
 class CreateAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\URLWildcardService\CreateSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            CreateEvent::class => ['onCreate', 0],
+        ];
+    }
+
+    public function onCreate(CreateEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'urlWildcardId' => $signal->urlWildcardId,
+            'urlWildcardId' => $event->getUrlWildcard()->id,
         ];
 
         $this->auditService->log($this);

@@ -3,20 +3,25 @@
 namespace Edgar\EzUIAuditBundle\Audit\ObjectState;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\ObjectState\DeleteObjectStateEvent;
 
 class DeleteObjectStateAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\ObjectStateService\DeleteObjectStateSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            DeleteObjectStateEvent::class => ['onDeleteObjectStateEvent', 0],
+        ];
+    }
+
+    public function onDeleteObjectStateEvent(DeleteObjectStateEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'objectStateId' => $signal->objectStateId,
+            'objectStateId' => $event->getObjectState()->id,
         ];
 
         $this->auditService->log($this);

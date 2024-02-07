@@ -3,22 +3,27 @@
 namespace Edgar\EzUIAuditBundle\Audit\Role;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\Role\AssignRoleToUserGroupEvent;
 
 class AssignRoleToUserGroupAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\RoleService\AssignRoleToUserGroupSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            AssignRoleToUserGroupEvent::class => ['onAssignRoleToUserGroup', 0],
+        ];
+    }
+
+    public function onAssignRoleToUserGroup(AssignRoleToUserGroupEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'roleId' => $signal->roleId,
-            'userGroupId' => $signal->userGroupId,
-            'roleLimitation identifier' => $signal->roleLimitation->getIdentifier(),
+            'roleId' => $event->getRole()->id,
+            'userGroupId' => $event->getUserGroup()->id,
+            'roleLimitation identifier' => $event->getRoleLimitation()->getIdentifier(),
         ];
 
         $this->auditService->log($this);

@@ -2,9 +2,9 @@
 
 namespace Edgar\EzUIAudit\Form\Mapper;
 
-use eZ\Publish\API\Repository\UserService;
+use Ibexa\Contracts\Core\Repository\UserService;
 use Pagerfanta\Pagerfanta;
-use eZ\Publish\API\Repository\Exceptions\NotFoundException;
+use Ibexa\Contracts\Core\Repository\Exceptions\NotFoundException;
 
 class PagerContentToLogMapper
 {

@@ -3,20 +3,25 @@
 namespace Edgar\EzUIAuditBundle\Audit\ObjectState;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\ObjectState\UpdateObjectStateGroupEvent;
 
 class UpdateObjectStateGroupAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\ObjectStateService\UpdateObjectStateGroupSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            UpdateObjectStateGroupEvent::class => ['onUpdateObjectStateGroup', 0],
+        ];
+    }
+
+    public function onUpdateObjectStateGroup(UpdateObjectStateGroupEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'objectStateGroupId' => $signal->objectStateGroupId,
+            'objectStateGroupId' => $event->getObjectStateGroup()->id,
         ];
 
         $this->auditService->log($this);

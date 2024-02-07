@@ -3,21 +3,26 @@
 namespace Edgar\EzUIAuditBundle\Audit\ContentType;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\ContentType\CopyContentTypeEvent;
 
 class CopyContentTypeAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\ContentTypeService\CopyContentTypeSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            CopyContentTypeEvent::class => ['onCopyContentType', 0],
+        ];
+    }
+
+    public function onCopyContentType(CopyContentTypeEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'contentTypeId' => $signal->contentTypeId,
-            'userId' => $signal->userId,
+            'contentTypeId' => $event->getContentType()->id,
+            'userId' => $event->getContentTypeCopy()->creatorId,
         ];
 
         $this->auditService->log($this);

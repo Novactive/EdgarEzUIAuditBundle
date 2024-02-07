@@ -3,22 +3,27 @@
 namespace Edgar\EzUIAuditBundle\Audit\Location;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\Location\CopySubtreeEvent;
 
 class CopySubtreeAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\LocationService\CopySubtreeSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            CopySubtreeEvent::class => ['onCopySubtree', 0],
+        ];
+    }
+
+    public function onCopySubtree(CopySubtreeEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'subtreeId' => $signal->subtreeId,
-            'targetNewSubtreeId' => $signal->targetNewSubtreeId,
-            'targetParentLocationId' => $signal->targetParentLocationId,
+            'subtreeId' => $event->getSubtree()->id,
+            'targetNewSubtreeId' => $event->getTargetParentLocation()->contentId,
+            'targetParentLocationId' => $event->getTargetParentLocation()->id,
         ];
 
         $this->auditService->log($this);

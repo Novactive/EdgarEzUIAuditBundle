@@ -3,20 +3,25 @@
 namespace Edgar\EzUIAuditBundle\Audit\ContentType;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\ContentType\PublishContentTypeDraftEvent;
 
 class PublishContentTypeDraftAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\ContentTypeService\PublishContentTypeDraftSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            PublishContentTypeDraftEvent::class => ['onPublishContentTypeDraft', 0],
+        ];
+    }
+
+    public function onPublishContentTypeDraft(PublishContentTypeDraftEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'contentTypeDraftId' => $signal->contentTypeDraftId,
+            'contentTypeDraftId' => $event->getContentTypeDraft()->id,
         ];
 
         $this->auditService->log($this);

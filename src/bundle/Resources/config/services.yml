@@ -17,7 +17,7 @@ services:
 
     Edgar\EzUIAuditBundle\Cron\AuditExportCron:
         arguments:
-            $kernelRootDir: "%kernel.root_dir%"
+            $kernelRootDir: "%kernel.project_dir%"
             $varDir: "$var_dir;ezsettings$"
             $storageDir: "$storage_dir$"
         tags:
@@ -30,13 +30,31 @@ services:
 
     Edgar\EzUIAudit\Form\Type\AuditTypeChoiceType: ~
 
-    Edgar\EzUIAuditBundle\Command\AuditExportAllRequests:
-        arguments:
-          $kernelRootDir: "%kernel.root_dir%"
-          $varDir: "$var_dir;ezsettings$"
-          $storageDir: "$storage_dir$"
-        tags:
-        - { name: "edgar.export.all", alias: "audit_export_all", priority: -999, expression: "*/5 * * * *" }
+#    Edgar\EzUIAuditBundle\Command\AuditExportAllRequests:
+#        arguments:
+#            $kernelRootDir: "%kernel.project_dir%"
+#            $varDir: "$var_dir;ezsettings$"
+#            $storageDir: "$storage_dir$"
+#        tags:
+#            - { name: "edgar.export.all", alias: "audit_export_all", priority: -999, expression: "*/5 * * * *" }
+
+    Edgar\EzUIAudit\Form\Factory\ConfigureFormFactory:
+        public: true
+        
+    Edgar\EzUIAudit\Form\SubmitHandler:
+        public: true
+
+    Edgar\EzUIAuditBundle\Service\AuditService:
+        public: true
+
+    Edgar\EzUIAudit\Form\Factory\FormFactory:
+        public: true
+        
+    Edgar\EzUIAudit\Form\Factory\ExportFormFactory:
+        public: true
+        
+    Edgar\EzUIAudit\Form\Mapper\PagerContentToLogMapper:
+        public: true
 
     Edgar\EzUIAudit\Form\Mapper\PagerContentToExportMapper:
-        arguments: ["@ezpublish.api.service.user","@translator.default"]
+        public: true

@@ -3,20 +3,25 @@
 namespace Edgar\EzUIAuditBundle\Audit\User;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\User\CreateUserGroupEvent;
 
 class CreateUserGroupAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\UserService\CreateUserGroupSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            CreateUserGroupEvent::class => ['onCreateUserGroup', 0],
+        ];
+    }
+
+    public function onCreateUserGroup(CreateUserGroupEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'userGroupId' => $signal->userGroupId,
+            'userGroupId' => $event->getUserGroup()->id,
         ];
 
         $this->auditService->log($this);

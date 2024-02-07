@@ -3,23 +3,27 @@
 namespace Edgar\EzUIAuditBundle\Audit\Content;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\Content\PublishVersionEvent;
 
 class PublishVersionAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\ContentService\PublishVersionSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            PublishVersionEvent::class => ['onPublishVersion', 0],
+        ];
+    }
+
+    public function onPublishVersion(PublishVersionEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'contentId' => $signal->contentId,
-            'versionNo' => $signal->versionNo,
+            'contentId' => $event->getContent()->id,
+            'versionNo' => $event->getVersionInfo()->versionNo
         ];
-
         $this->auditService->log($this);
     }
 }

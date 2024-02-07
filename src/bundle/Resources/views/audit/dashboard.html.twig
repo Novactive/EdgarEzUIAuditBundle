@@ -1,132 +1,147 @@
-{% extends 'EzPlatformAdminUiBundle::layout.html.twig' %}
-
-{% form_theme form_filter_audit '@EzPlatformAdminUi/form_fields.html.twig'  %}
+{% extends '@ibexadesign/ui/layout.html.twig' %}
 
 {% trans_default_domain 'edgarezuiaudit' %}
-
-{% block body_class %}ez-info-view{% endblock %}
-
+{% form_theme form_filter_audit '@ibexadesign/ui/form_fields.html.twig' %}
 {% block breadcrumbs %}
-    {% include '@EzPlatformAdminUi/parts/breadcrumbs.html.twig' with { items: [
+    {% include '@ibexadesign/ui/breadcrumbs.html.twig' with { items: [
         { value: 'breadcrumb.audit'|trans(domain='messages')|desc('Audit') , },
         { url: path('edgar.audit.dashboard'), value: 'dashboard.breadcrumb.view'|trans|desc('Dashboard') },
     ]} %}
 {% endblock %}
-
-{% block page_title %}
-    {% include '@EzPlatformAdminUi/parts/page_title.html.twig' with {
+{% block header %}
+    {% include '@ibexadesign/ui/page_title.html.twig' with {
         title: 'dashboard.view.title'|trans|desc('Audit dashboard'),
         iconName: 'dashboard'
     } %}
 {% endblock %}
 
 {% block content %}
-
-    <section class="container mt-4">
-        {{ form_start(form_filter_audit, { 'action': path('edgar.audit.dashboard') }) }}
-
-            <div class="input-group">
+    <section class="container ibexa-container">
+        {% set body_rows = [] %}
+        {{ form_start(form_filter_audit, {
+            action: path('edgar.audit.dashboard'),
+            attr: { class: 'edgar-audit-form' }
+        }) }}
+        <div class="input-group mb-3">
+            <div class="select-types">
                 {{ form_widget(form_filter_audit.audit_types) }}
-                <span class="input-group-btn">
-                    <button type="submit" class="btn btn-primary">
-                    <svg class="ez-icon ez-icon-search-button">
-                        <use xlink:href="{{ asset('bundles/ezplatformadminui/img/ez-icons.svg') }}#search"></use>
-                    </svg>
-                    {{ 'dashboard.perform'|trans|desc('Search') }}</button>
-                </span>
             </div>
+            <span class="input-group-btn search">
+                <button type="submit" class="btn btn-primary">
+                <svg class="ibexa-icon ibexa-icon--small">
+                    <use xlink:href="{{ asset('bundles/ibexaicons/img/all-icons.svg') }}#search"></use>
+                </svg>
+                {{ 'dashboard.perform'|trans|desc('Search') }}</button>
+            </span>
+        </div>
+        {% set date_start_label %}
+            {{ form_label(form_filter_audit.date_start) }}
+        {% endset %}
 
-            <br />
-            <table class="table ez-table--list">
-                <thead>
-                    <tr>
-                        <th colspan="2">{{ 'Additional filters'|trans }}</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>
-                            {{ form_label(form_filter_audit.date_start) }}
-                        </td>
-                        <td>
-                            <div class="flatpickr">
-                                {{ form_widget(form_filter_audit.date_start) }}
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            {{ form_label(form_filter_audit.date_end) }}
-                        </td>
-                        <td>
-                            <div class="flatpickr">
-                                {{ form_widget(form_filter_audit.date_end) }}
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        {% set date_start %}
+            <div class="flatpickr">
+                {{ form_widget(form_filter_audit.date_start) }}
+            </div>
+        {% endset %}
+
+        {% set date_end_label %}
+            <div class="flatpickr">
+                {{ form_label(form_filter_audit.date_end) }}
+            </div>
+        {% endset %}
+
+        {% set date_end %}
+            {{ form_widget(form_filter_audit.date_end) }}
+        {% endset %}
+
+        {% set body_rows = body_rows|merge([{ cols: [
+            { content: date_start_label },
+            { content: date_start },
+        ] },
+            { cols: [
+                { content: date_end_label },
+                { content: date_end },
+            ] }
+        ]) %}
+        {% include '@ibexadesign/ui/component/table/table.html.twig' with {
+            class: 'edgar-table-dash',
+            headline:  'Additional filters'|trans ,
+            body_rows,
+        } %}
         {{ form_end(form_filter_audit) }}
-
-        {% if results is defined %}
-            {{ form_start(form_export_audit, { 'action': path('edgar.audit.export.ask') }) }}
+        <div>
+            {% if results is defined %}
+                {{ form_start(form_export_audit, { 'action': path('edgar.audit.export.ask') }) }}
                 {{ form_row(form_export_audit.audit_types) }}
                 {{ form_row(form_export_audit.date_start, { hidden: 'hidden' }) }}
                 {{ form_row(form_export_audit.date_end, { hidden: 'hidden' }) }}
-                <div class="ez-table-header mt-3">
-                    <h5>{{ 'search.header'|trans({'%total%': pager.nbResults})|desc('Search results (%total%)') }}</h5>
-                    {% if results is not empty %}
-                        <span class="input-group-btn">
-                            <button type="submit" class="btn btn-primary">
-                            {{ 'export.perform'|trans|desc('Ask for an export') }}</button>
-                        </span>
-                    {% endif %}
-                </div>
+                {% set body_rows = [] %}
 
-                {% if results is empty %}
-                    <table class="table">
-                        <tr>
-                            <td colspan="4">
-                                <span>{{ 'search.no_result'|trans|desc('Sorry, no results were found.') }}</span>
-                            </td>
-                        </tr>
-                    </table>
-                {% else %}
-                    <table class="table">
-                        <thead>
-                        <tr>
-                            <th>{{ 'log.user_id'|trans|desc('User ID') }}</th>
-                            <th>{{ 'log.user_name'|trans|desc('User name') }}</th>
-                            <th>{{ 'log.group_name'|trans|desc('Group name') }}</th>
-                            <th>{{ 'log.audit_name'|trans|desc('Audit name') }}</th>
-                            <th>{{ 'log.infos'|trans|desc('Infos') }}</th>
-                            <th>{{ 'log.date'|trans|desc('Date') }}</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for row in results %}
-                            {% include '@EdgarEzUIAudit/audit/log/table_row.html.twig' with { row: row } %}
-                        {% endfor %}
-                        </tbody>
-                    </table>
+
+                {% for row in results %}
+                    {% set user_id %}
+                        {{ row.user_id }}
+                    {% endset %}
+
+                    {% set user_name %}
+                        {{ row.user_name }}
+                    {% endset %}
+
+                    {% set group_name %}
+                        {{ row.group_name }}
+                    {% endset %}
+
+                    {% set audit_name %}
+                        {{ row.audit_name }}
+                    {% endset %}
+
+                    {% set infos %}
+                        <ul>
+                            {% for key, value in row.infos %}
+                                <li>{{ key }}: {{ value }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endset %}
+                    {% set date %}
+                        {{ row.date|date('M d, Y') }}
+                    {% endset %}
+                    {% set body_rows = body_rows|merge([{ cols: [
+                        { content: user_id, raw: true },
+                        { content: user_name, raw: true },
+                        { content: group_name, raw: true },
+                        { content: audit_name, raw: true },
+                        { content: infos, raw: true },
+                        { content: date, raw: true },
+                    ] }]) %}
+                {% endfor %}
+                {% set actions %}
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn btn-primary">
+                        {{ 'export.perform'|trans|desc('Ask for an export') }}</button>
+                    </span>
+                {% endset %}
+                {% include '@ibexadesign/ui/component/table/table.html.twig' with {
+                    headline:  'search.header'|trans({'%total%': pager.nbResults})|desc('Search results (%total%)')  ,
+                    head_cols: [
+                        { content: 'log.user_id'|trans|desc('User ID')  },
+                        { content: 'log.user_name'|trans|desc('User name') },
+                        { content: 'log.group_name'|trans|desc('Group name') },
+                        { content: 'log.audit_name'|trans|desc('Audit name') },
+                        { content: 'log.infos'|trans|desc('Infos') },
+                        { content: 'log.date'|trans|desc('Date') },
+                    ],
+                    body_rows,
+                    actions:actions,
+                    empty_table_info_text: 'search.no_result'|trans|desc('Sorry, no results were found.'),
+                } %}
+                {% if pager.haveToPaginate %}#}
                     <div class="row justify-content-center align-items-center">
-                        <h6>{{ 'search.viewing'|trans({'%viewing%': pager.currentPageResults|length, '%total%': pager.nbResults})|desc('Viewing %viewing% out of %total% sub-items') }}</h6>
+                        {{ pagerfanta(pager, 'ibexa') }}
                     </div>
-                    {% if pager.haveToPaginate %}
-                        <div class="row justify-content-center align-items-center">
-                            {{ pagerfanta(pager, 'ez') }}
-                        </div>
-                    {% endif %}
                 {% endif %}
-            {{ form_end(form_export_audit) }}
-        {% endif %}
+                {{ form_end(form_export_audit) }}
+            {% endif %}
+        </div>
     </section>
+{% endblock %}
 
-{% endblock %}
-{% block javascripts %}
-    {%  javascripts
-        '@EdgarEzUIAuditBundle/Resources/public/js/edgardashboard.js'
-    %}
-        <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
-{% endblock %}

@@ -36,22 +36,21 @@ class AuditExportCron extends AbstractCron
     private $storageDir;
 
     /**
-     * AuditExportCron constructor.
-     *
-     * @param null|string $name
      * @param EntityManagerInterface $entityManager
      * @param AuditService $auditService
      * @param string $kernelRootDir
      * @param string $varDir
      * @param string $storageDir
+     * @param string|null $name
+     * @throws \Doctrine\ORM\Exception\NotSupported
      */
     public function __construct(
-        ?string $name = null,
         EntityManagerInterface $entityManager,
         AuditService $auditService,
         string $kernelRootDir,
         string $varDir,
-        string $storageDir
+        string $storageDir,
+        ?string $name = null
     ) {
         parent::__construct($name);
         $this->exportRepository = $entityManager->getRepository(EdgarEzAuditExport::class);

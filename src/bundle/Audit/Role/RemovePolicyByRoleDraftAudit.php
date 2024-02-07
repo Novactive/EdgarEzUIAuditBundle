@@ -3,21 +3,26 @@
 namespace Edgar\EzUIAuditBundle\Audit\Role;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\Role\RemovePolicyByRoleDraftEvent;
 
 class RemovePolicyByRoleDraftAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\RoleService\RemovePolicyByRoleDraftSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            RemovePolicyByRoleDraftEvent::class => ['onRemovePolicyByRoleDraft', 0],
+        ];
+    }
+
+    public function onRemovePolicyByRoleDraft(RemovePolicyByRoleDraftEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'roleId' => $signal->roleId,
-            'policyId' => $signal->policyId,
+            'roleId' => $event->getRoleDraft()->id,
+            'policyId' => $event->getPolicyDraft()->id,
         ];
 
         $this->auditService->log($this);

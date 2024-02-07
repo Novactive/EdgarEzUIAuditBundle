@@ -7,11 +7,11 @@ use Edgar\EzUIAudit\Form\Data\ConfigureAuditData;
 use Edgar\EzUIAudit\Form\Factory\ConfigureFormFactory;
 use Edgar\EzUIAudit\Form\SubmitHandler;
 use Edgar\EzUIAuditBundle\Service\AuditService;
-use eZ\Publish\API\Repository\PermissionResolver;
-use EzSystems\EzPlatformAdminUi\Notification\NotificationHandlerInterface;
+use Ibexa\Contracts\Core\Repository\PermissionResolver;
+use Ibexa\AdminUi\Notification\FlashBagNotificationHandler;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AuditConfigureController extends BaseController
 {
@@ -28,7 +28,7 @@ class AuditConfigureController extends BaseController
      * @param SubmitHandler $submitHandler
      * @param AuditService $auditService
      * @param PermissionResolver $permissionResolver
-     * @param NotificationHandlerInterface $notificationHandler
+     * @param FlashBagNotificationHandler $notificationHandler
      * @param TranslatorInterface $translator
      */
     public function __construct(
@@ -36,7 +36,7 @@ class AuditConfigureController extends BaseController
         SubmitHandler $submitHandler,
         AuditService $auditService,
         PermissionResolver $permissionResolver,
-        NotificationHandlerInterface $notificationHandler,
+        FlashBagNotificationHandler $notificationHandler,
         TranslatorInterface $translator
     ) {
         parent::__construct($auditService, $permissionResolver, $notificationHandler, $translator);

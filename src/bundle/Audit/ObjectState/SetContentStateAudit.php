@@ -3,22 +3,27 @@
 namespace Edgar\EzUIAuditBundle\Audit\ObjectState;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\ObjectState\SetContentStateEvent;
 
 class SetContentStateAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\ObjectStateService\SetContentStateSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            SetContentStateEvent::class => ['onSetContentState', 0],
+        ];
+    }
+
+    public function onSetContentState(SetContentStateEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'objectStateGroupId' => $signal->objectStateGroupId,
-            'objectStateId' => $signal->objectStateId,
-            'contentId' => $signal->contentId,
+            'objectStateGroupId' => $event->getObjectStateGroup()->id,
+            'objectStateId' => $event->getObjectState()->id,
+            'contentId' => $event->getContentInfo()->id,
         ];
 
         $this->auditService->log($this);

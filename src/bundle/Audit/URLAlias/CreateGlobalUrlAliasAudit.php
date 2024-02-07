@@ -3,20 +3,25 @@
 namespace Edgar\EzUIAuditBundle\Audit\URLAlias;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\URLAlias\CreateGlobalUrlAliasEvent;
 
 class CreateGlobalUrlAliasAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\URLAliasService\CreateGlobalUrlAliasSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            CreateGlobalUrlAliasEvent::class => ['onCreateGlobalUrlAlias', 0],
+        ];
+    }
+
+    public function onCreateGlobalUrlAlias(CreateGlobalUrlAliasEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'urlAliasId' => $signal->urlAliasId,
+            'urlAliasId' => $event->getUrlAlias()->id,
         ];
 
         $this->auditService->log($this);

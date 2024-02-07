@@ -3,21 +3,26 @@
 namespace Edgar\EzUIAuditBundle\Audit\ObjectState;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\ObjectState\SetPriorityOfObjectStateEvent;
 
 class SetPriorityOfObjectStateAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\ObjectStateService\SetPriorityOfObjectStateSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            SetPriorityOfObjectStateEvent::class => ['onSetPriorityOfObjectState', 0],
+        ];
+    }
+
+    public function onSetPriorityOfObjectState(SetPriorityOfObjectStateEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'objectStateId' => $signal->objectStateId,
-            'priority' => $signal->priority,
+            'objectStateId' => $event->getObjectState()->id,
+            'priority' => $event->getPriority(),
         ];
 
         $this->auditService->log($this);

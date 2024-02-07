@@ -1,37 +1,37 @@
 edgar.audit.dashboard:
     path: /audit/dashboard
     defaults:
-        _controller: 'EdgarEzUIAuditBundle:AuditDashboard:dashboard'
+        _controller: 'Edgar\EzUIAuditBundle\Controller\AuditDashboardController::dashboardAction'
 
 edgar.audit.configure:
     path: /audit/configure
     defaults:
-        _controller: 'EdgarEzUIAuditBundle:AuditConfigure:configure'
+        _controller: 'Edgar\EzUIAuditBundle\Controller\AuditConfigureController::configureAction'
 
 edgar.audit.export:
     path: /audit/export
     defaults:
-        _controller: 'EdgarEzUIAuditBundle:AuditExport:export'
+        _controller: 'Edgar\EzUIAuditBundle\Controller\AuditExportController::exportAction'
 
 edgar.audit.export.ask:
     path: /audit/export/ask
     methods: ['POST']
     defaults:
-        _controller: 'EdgarEzUIAuditBundle:AuditExport:askExport'
+        _controller: 'Edgar\EzUIAuditBundle\Controller\AuditExportController::askExportAction'
 
 edgar.audit.export.download:
     path: /audit/export/download/{exportId}/{filename}
     defaults:
-        _controller: 'EdgarEzUIAuditBundle:AuditExport:download'
+        _controller: 'Edgar\EzUIAuditBundle\Controller\AuditExportController::downloadAction'
     requirements:
         exportId: \d+
 
 edgar.audit.delete.log:
     path: /audit/delete-log/{id}
     defaults:
-        _controller: 'EdgarEzUIAuditBundle:AuditExport:deleteLog'
+        _controller: 'Edgar\EzUIAuditBundle\Controller\AuditExportController:deleteLogAction'
 
 edgar.audit.export.now:
     path: /audit/export/now
     defaults:
-        _controller: 'EdgarEzUIAuditBundle:AuditExport:exportNow'
+        _controller: 'Edgar\EzUIAuditBundle\Controller\AuditExportController:exportNowAction'

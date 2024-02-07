@@ -2,7 +2,7 @@
 
 namespace Edgar\EzUIAuditBundle\DependencyInjection\Security\PolicyProvider;
 
-use eZ\Bundle\EzPublishCoreBundle\DependencyInjection\Security\PolicyProvider\YamlPolicyProvider;
+use Ibexa\Bundle\Core\DependencyInjection\Security\PolicyProvider\YamlPolicyProvider;
 
 class UIAuditPolicyProvider extends YamlPolicyProvider
 {

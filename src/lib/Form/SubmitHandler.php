@@ -2,24 +2,24 @@
 
 namespace Edgar\EzUIAudit\Form;
 
-use EzSystems\EzPlatformAdminUi\Notification\NotificationHandlerInterface;
+use Ibexa\AdminUi\Notification\FlashBagNotificationHandler;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\RouterInterface;
 
 class SubmitHandler
 {
-    /** @var NotificationHandlerInterface $notificationHandler */
+    /** @var FlashBagNotificationHandler $notificationHandler */
     protected $notificationHandler;
 
     /** @var RouterInterface $router */
     protected $router;
 
     /**
-     * @param NotificationHandlerInterface $notificationHandler
+     * @param FlashBagNotificationHandler $notificationHandler
      * @param RouterInterface $router
      */
-    public function __construct(NotificationHandlerInterface $notificationHandler, RouterInterface $router)
+    public function __construct(FlashBagNotificationHandler $notificationHandler, RouterInterface $router)
     {
         $this->notificationHandler = $notificationHandler;
         $this->router = $router;

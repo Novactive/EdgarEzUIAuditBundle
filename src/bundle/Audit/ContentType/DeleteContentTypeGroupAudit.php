@@ -3,20 +3,25 @@
 namespace Edgar\EzUIAuditBundle\Audit\ContentType;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\ContentType\DeleteContentTypeGroupEvent;
 
 class DeleteContentTypeGroupAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\ContentTypeService\DeleteContentTypeGroupSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            DeleteContentTypeGroupEvent::class => ['onDeleteContentTypeGroup', 0],
+        ];
+    }
+
+    public function onDeleteContentTypeGroup(DeleteContentTypeGroupEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'contentTypeGroupId' => $signal->contentTypeGroupId,
+            'contentTypeGroupId' => $event->getContentTypeGroup()->id,
         ];
 
         $this->auditService->log($this);

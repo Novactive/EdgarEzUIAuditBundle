@@ -4,8 +4,8 @@
 
     const exportUp = (event) => {
         event.preventDefault();
-        const svgUp = event.currentTarget.querySelector('.ez-icon-caret-up');
-        const svgDown = event.currentTarget.querySelector('.ez-icon-caret-down');
+        const svgUp = event.currentTarget.querySelector('.ibexa-icon-caret-up');
+        const svgDown = event.currentTarget.querySelector('.ibexa-icon-caret-down');
         svgDown.style.display = "none";
         svgUp.style.display = "block";
         event.currentTarget.parentNode.parentNode.nextElementSibling.style.display = "table-row";
@@ -15,8 +15,8 @@
 
     const exportDown = (event) => {
         event.preventDefault();
-        const svgUp = event.currentTarget.querySelector('.ez-icon-caret-up');
-        const svgDown = event.currentTarget.querySelector('.ez-icon-caret-down');
+        const svgUp = event.currentTarget.querySelector('.ibexa-icon-caret-up');
+        const svgDown = event.currentTarget.querySelector('.ibexa-icon-caret-down');
         svgDown.style.display = "block";
         svgUp.style.display = "none";
         event.currentTarget.parentNode.parentNode.nextElementSibling.style.display = "none";
@@ -30,7 +30,6 @@
 
 jQuery(function($) {
     $(document).on('click', '.delete-request', function () {
-        $('#audit-delete-request').modal('show');
-        $('.delete-log').attr('href', $(this).attr('data-content'));
+        $('#delete-item-export').attr('href', $(this).attr('data-click'));
     });
 });

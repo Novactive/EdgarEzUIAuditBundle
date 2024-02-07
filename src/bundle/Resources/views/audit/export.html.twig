@@ -1,88 +1,152 @@
-{% extends 'EzPlatformAdminUiBundle::layout.html.twig' %}
+{% extends '@ibexadesign/ui/layout.html.twig' %}
 
 {% trans_default_domain 'edgarezuiaudit' %}
 
 {% block body_class %}ez-info-view{% endblock %}
-
 {% block breadcrumbs %}
-    {% include '@EzPlatformAdminUi/parts/breadcrumbs.html.twig' with { items: [
+    {% include '@ibexadesign/ui/breadcrumbs.html.twig' with { items: [
         { value: 'breadcrumb.audit'|trans(domain='messages')|desc('Audit') , },
         { url: path('edgar.audit.export'), value: 'export.breadcrumb.view'|trans|desc('Export') },
     ]} %}
 {% endblock %}
-
-{% block page_title %}
-    {% include '@EzPlatformAdminUi/parts/page_title.html.twig' with {
+{% block header %}
+    {% include '@ibexadesign/ui/page_title.html.twig' with {
         title: 'export.view.title'|trans|desc('Audit export'),
         iconName: 'history'
     } %}
 {% endblock %}
 
 {% block content %}
-    <section class="container mt-4">
+    <section class="container ibexa-container">
+        {% set modal_data_target = 'delete-submission-modal' %}
+        {% set body_rows = [] %}
+        {% for row in exports %}
+            {% set user_id %}
+                {{ row.user_id }}
+            {% endset %}
 
-        <div class="ez-table-header mt-3">
-            <h5>{{ 'export.header'|trans({'%total%': pager.nbResults})|desc('Export results (%total%)') }}</h5>
-            {% set statusInit = false %}
-            {% for export in exports %}
-                {% if export['status'] == 'Init'%}
-                    {% set statusInit = true %}
+            {% set user_name %}
+                {{ row.user_name }}
+            {% endset %}
+
+            {% set date_start %}
+                {{ row.date_start|format_datetime('short', 'none', locale=app.request.locale) }}
+            {% endset %}
+
+            {% set date_end %}
+                {{ row.date_end|format_datetime('short', 'none', locale=app.request.locale) }}
+            {% endset %}
+
+            {% set date %}
+                {{ row.date|format_datetime('short', 'none', locale=app.request.locale) }}
+            {% endset %}
+
+            {% set status %}
+                {{ row.status }}
+            {% endset %}
+
+            {% set file %}
+                {% if row.file is not empty %}
+                    <a href="{{ path('edgar.audit.export.download', {'exportId': row.id, 'filename': row.file}) }}">
+                        {{ 'export.download'|trans|desc('Download') }}
+                    </a>
                 {% endif %}
-            {% endfor %}
-            <form action="{{ path('edgar.audit.export.now') }}">
+            {% endset %}
+
+            {% set action %}
+                {% if row.status != "OK" %}
+                    <button
+                            data-click="{{ path('edgar.audit.delete.log',{'id' : row.id}) }}"
+                            type="button"
+                            class="btn btn-danger delete-request"
+                            data-bs-toggle="modal"
+                            data-bs-target="#{{ modal_data_target }}"
+                            title="{{ 'tab.submissions.action.delete'|trans|desc('Delete Submission') }}">
+                        <svg class="ibexa-icon ibexa-icon--light ibexa-icon--small ibexa-icon-trash">
+                            <use xlink:href="{{ asset('bundles/ibexaadminui/img/ibexa-icons.svg') }}#trash"></use>
+                        </svg>
+                    </button>
+                {% endif %}
+            {% endset %}
+
+            {% set content %}
+                <a href="#" class="audit-export audit-export-up">
+                    <svg class="ibexa-icon ibexa-icon-caret-down ibexa-icon--small">
+                        <use xlink:href="{{ asset('bundles/ibexaicons/img/all-icons.svg') }}#caret-down"></use>
+                    </svg>
+                    <svg class="ibexa-icon ibexa-icon-caret-up ibexa-icon--small" style="display:none;">
+                        <use xlink:href="{{ asset('bundles/ibexaicons/img/all-icons.svg') }}#caret-up"></use>
+                    </svg>
+                </a>
+            {% endset %}
+
+            {% set audits_title %}
+                {{ 'export.audits'|trans|desc('Audits') }}
+            {% endset %}
+
+            {% set audits %}
+                <ul>
+                    {% for audit in row.audits %}
+                        <li>{{ audit }}</li>
+                    {% endfor %}
+                </ul>
+            {% endset %}
+
+            {% set body_rows = body_rows|merge([{ cols: [
+                { content: user_id },
+                { content: user_name },
+                { content: date_start },
+                { content: date_end },
+                { content: date },
+                { content: status },
+                { content: file },
+                { content: action },
+                { content: content },
+            ] }]) %}
+            {% set body_rows = body_rows|merge([{ attr: {style:"display:none"}, cols: [
+                { content: audits_title,  class: 'font-bold'  },
+                { content: audits, attr: { colspan: 7 } },
+            ] }]) %}
+
+
+        {% endfor %}
+
+        {% include '@ibexadesign/ui/component/table/table.html.twig' with {
+            class: 'edgar-table',
+            headline:  'export.header'|trans({'%total%': pager.nbResults})|desc('Export results (%total%)') ,
+            head_cols: [
+                { content: 'export.user_id'|trans|desc('User ID')  },
+                { content: 'export.user_name'|trans|desc('User name') },
+                { content: 'export.date_start'|trans|desc('Date start') },
+                { content: 'export.date_end'|trans|desc('Date end') },
+                { content: 'export.date'|trans|desc('Date') },
+                { content: 'export.status'|trans|desc('Status') },
+                { content: 'export.file'|trans|desc('File') },
+                { content: '' },
+            ],
+            body_rows,
+            empty_table_info_text: 'export.no_result'|trans|desc('Sorry, no export were found.'),
+        } %}
+
+        {% set statusInit = false %}
+        {% for export in exports %}
+            {% if export['status'] == 'Init' %}
+                {% set statusInit = true %}
+            {% endif %}
+        {% endfor %}
+        <form action="{{ path('edgar.audit.export.now') }}">
                 <span class="input-group-btn">
-                    <button type="submit" class="btn btn-primary" {{ pager.nbResults == 0 or not statusInit ? 'disabled' }}>
+                    <button type="submit"
+                            class="btn btn-primary" {{ pager.nbResults == 0 or not statusInit ? 'disabled' }}>
                     {{ 'export.now'|trans|desc('Export now') }}
                     </button>
                 </span>
-            </form>
-        </div>
-
-        {% if exports is empty %}
-            <table class="table">
-                <tr>
-                    <td colspan="4">
-                        <span>{{ 'export.no_result'|trans|desc('Sorry, no export were found.') }}</span>
-                    </td>
-                </tr>
-            </table>
-        {% else %}
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>{{ 'export.user_id'|trans|desc('User ID') }}</th>
-                    <th>{{ 'export.user_name'|trans|desc('User name') }}</th>
-                    <th>{{ 'export.date_start'|trans|desc('Date start') }}</th>
-                    <th>{{ 'export.date_end'|trans|desc('Date end') }}</th>
-                    <th>{{ 'export.date'|trans|desc('Date') }}</th>
-                    <th>{{ 'export.status'|trans|desc('Status') }}</th>
-                    <th>{{ 'export.file'|trans|desc('File') }}</th>
-                    <th></th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for row in exports %}
-                    {% include '@EdgarEzUIAudit/audit/export/table_row.html.twig' with { row: row } %}
-                {% endfor %}
-                </tbody>
-            </table>
-            <div class="row justify-content-center align-items-center">
-                <h6>{{ 'search.viewing'|trans({'%viewing%': pager.currentPageResults|length, '%total%': pager.nbResults})|desc('Viewing %viewing% out of %total% sub-items') }}</h6>
-            </div>
-            {% if pager.haveToPaginate %}
-                <div class="row justify-content-center align-items-center">
-                    {{ pagerfanta(pager, 'ez') }}
-                </div>
-            {% endif %}
-        {% endif %}
+        </form>
+        <a href="" id="delete-item-export"></a>
+        {% include '@ibexadesign/ui/modal/bulk_delete_confirmation.html.twig' with {
+            'id': modal_data_target,
+            'message': 'ask.to_delete'|trans|desc('Are you sure you want to delete this request ?'),
+            'data_click': '#delete-item-export',
+        } %}
     </section>
-    {% include '@EdgarEzUIAudit/audit/export/audit-modal.html.twig' %}
-{% endblock %}
-
-{% block javascripts %}
-    {%  javascripts
-        '@EdgarEzUIAuditBundle/Resources/public/js/edgarezuiaudit.js'
-    %}
-        <script type="text/javascript" src="{{ asset_url }}"></script>
-    {% endjavascripts %}
 {% endblock %}

@@ -3,20 +3,25 @@
 namespace Edgar\EzUIAuditBundle\Audit\URLWildcard;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\URLWildcard\RemoveEvent;
 
 class RemoveAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\URLWildcardService\RemoveSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            RemoveEvent::class => ['onRemoveEvent', 0],
+        ];
+    }
+
+    public function onRemoveEvent(RemoveEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'urlWildcardId' => $signal->urlWildcardId,
+            'urlWildcardId' => $event->getUrlWildcard()->id,
         ];
 
         $this->auditService->log($this);

@@ -3,20 +3,25 @@
 namespace Edgar\EzUIAuditBundle\Audit\Role;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\Role\RemoveRoleAssignmentEvent;
 
 class RemoveRoleAssignmentAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\RoleService\RemoveRoleAssignmentSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            RemoveRoleAssignmentEvent::class => ['onRemoveRoleAssignment', 0],
+        ];
+    }
+
+    public function onRemoveRoleAssignment(RemoveRoleAssignmentEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'roleAssignmentId' => $signal->roleAssignmentId,
+            'roleAssignmentId' => $event->getRoleAssignment()->getRole()->id,
         ];
 
         $this->auditService->log($this);

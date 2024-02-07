@@ -4,22 +4,12 @@ services:
         autoconfigure: true
         public: false
 
-    Edgar\EzUIAuditBundle\Audit\Language\CreateLanguageAudit:
-        tags:
-            - { name: ezpublish.api.slot, signal: LanguageService\CreateLanguageSignal }
+    Edgar\EzUIAuditBundle\Audit\Language\CreateLanguageAudit: ~
 
-    Edgar\EzUIAuditBundle\Audit\Language\DeleteLanguageAudit:
-        tags:
-            - { name: ezpublish.api.slot, signal: LanguageService\DeleteLanguageSignal }
+    Edgar\EzUIAuditBundle\Audit\Language\DeleteLanguageAudit: ~
 
-    Edgar\EzUIAuditBundle\Audit\Language\DisableLanguageAudit:
-        tags:
-            - { name: ezpublish.api.slot, signal: LanguageService\DisableLanguageSignal }
+    Edgar\EzUIAuditBundle\Audit\Language\DisableLanguageAudit: ~
 
-    Edgar\EzUIAuditBundle\Audit\Language\EnableLanguageAudit:
-        tags:
-            - { name: ezpublish.api.slot, signal: LanguageService\EnableLanguageSignal }
+    Edgar\EzUIAuditBundle\Audit\Language\EnableLanguageAudit: ~
 
-    Edgar\EzUIAuditBundle\Audit\Language\UpdateLanguageNameAudit:
-        tags:
-            - { name: ezpublish.api.slot, signal: LanguageService\UpdateLanguageNameSignal }
+    Edgar\EzUIAuditBundle\Audit\Language\UpdateLanguageNameAudit: ~

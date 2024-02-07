@@ -3,21 +3,26 @@
 namespace Edgar\EzUIAuditBundle\Audit\User;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\User\DeleteUserEvent;
 
 class DeleteUserAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\UserService\DeleteUserSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            DeleteUserEvent::class => ['onDeleteUser', 0],
+        ];
+    }
+
+    public function onDeleteUser(DeleteUserEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'userId' => $signal->userId,
-            'affectedLocationIds' => $signal->affectedLocationIds,
+            'userId' => $event->getUser()->getUserId(),
+            'affectedLocationIds' => $event->getLocations(),
         ];
 
         $this->auditService->log($this);

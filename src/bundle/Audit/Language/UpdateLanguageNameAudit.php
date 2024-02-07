@@ -3,21 +3,26 @@
 namespace Edgar\EzUIAuditBundle\Audit\Language;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\Language\UpdateLanguageNameEvent;
 
 class UpdateLanguageNameAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\LanguageService\UpdateLanguageNameSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            UpdateLanguageNameEvent::class => ['onUpdateLanguageName', 0],
+        ];
+    }
+
+    public function onUpdateLanguageName(UpdateLanguageNameEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'languageId' => $signal->languageId,
-            'newName' => $signal->newName,
+            'languageId' => $event->getLanguage()->id,
+            'newName' => $event->getLanguage()->getName(),
         ];
 
         $this->auditService->log($this);

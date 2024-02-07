@@ -3,9 +3,12 @@
 namespace Edgar\EzUIAudit\Audit;
 
 use Edgar\EzUIAuditBundle\Service\AuditService;
-use eZ\Publish\Core\SignalSlot\Slot;
+//use Edgar\EzUIAuditBundle\Service\EventSubscriber;
+use Edgar\EzUIAudit\Audit\EventSubscriber;
+use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-abstract class AbstractAudit extends Slot implements AuditInterface
+
+abstract class AbstractAudit extends EventSubscriber implements AuditInterface
 {
     /** @var AuditService */
     protected $auditService;

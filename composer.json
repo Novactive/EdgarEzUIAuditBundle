@@ -20,9 +20,7 @@
   },
   "require": {
     "php": ">=7.1",
-    "ezsystems/ezpublish-kernel": "^7.1",
-    "ezsystems/ezplatform-admin-ui": "^1.1",
-    "edgar/ez-uicron-bundle": "^1.1"
+    "edgar/ez-uicron-bundle": "dev-master-ibx4"
   },
   "require-dev": {
     "friendsofphp/php-cs-fixer": "~2.7.1",

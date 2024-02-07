@@ -3,20 +3,25 @@
 namespace Edgar\EzUIAuditBundle\Audit\User;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\User\UpdateUserEvent;
 
 class UpdateUserAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\UserService\UpdateUserSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            UpdateUserEvent::class => ['onUpdateUser', 0],
+        ];
+    }
+
+    public function onUpdateUser(UpdateUserEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'userId' => $signal->userId,
+            'userId' => $event->getUser()->getUserId(),
         ];
 
         $this->auditService->log($this);

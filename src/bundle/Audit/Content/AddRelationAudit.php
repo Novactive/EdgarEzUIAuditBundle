@@ -3,24 +3,29 @@
 namespace Edgar\EzUIAuditBundle\Audit\Content;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\Content\AddRelationEvent;
 
 class AddRelationAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\ContentService\AddRelationSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            AddRelationEvent::class => ['onAddRelation', 0],
+        ];
+    }
+
+    public function onAddRelation(AddRelationEvent $event): void
+    {
+
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'dstContentId' => $signal->dstContentId,
-            'srcContentId' => $signal->srcContentId,
-            'srcVersionNo' => $signal->srcVersionNo,
+            'dstContentId' => $event->getDestinationContent()->id,
+            'srcContentId' => $event->getRelation()->sourceContentInfo->id,
+            'srcVersionNo' => $event->getRelation()->sourceContentInfo->currentVersionNo,
         ];
-
         $this->auditService->log($this);
     }
 }

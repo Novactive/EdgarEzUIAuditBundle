@@ -3,21 +3,26 @@
 namespace Edgar\EzUIAuditBundle\Audit\ContentType;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\ContentType\UnassignContentTypeGroupEvent;
 
 class UnassignContentTypeGroupAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\ContentTypeService\UnassignContentTypeGroupSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            UnassignContentTypeGroupEvent::class => ['onUnassignContentTypeGroup', 0],
+        ];
+    }
+
+    public function onUnassignContentTypeGroup(UnassignContentTypeGroupEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'contentTypeGroupId' => $signal->contentTypeGroupId,
-            'contentTypeId' => $signal->contentTypeId,
+            'contentTypeGroupId' => $event->getContentTypeGroup()->id,
+            'contentTypeId' => $event->getContentType()->id,
         ];
 
         $this->auditService->log($this);

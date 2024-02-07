@@ -3,23 +3,28 @@
 namespace Edgar\EzUIAuditBundle\Audit\Location;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\Location\UnhideLocationEvent;
 
 class UnhideLocationAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\LocationService\UnhideLocationSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            UnhideLocationEvent::class => ['onUnhideLocation', 0],
+        ];
+    }
+
+    public function onUnhideLocation(UnhideLocationEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'locationId' => $signal->locationId,
-            'currentVersionNo' => $signal->currentVersionNo,
-            'parentLocationId' => $signal->parentLocationId,
-            'contentId' => $signal->contentId,
+            'locationId' => $event->getLocation()->id,
+            'currentVersionNo' => $event->getLocation()->getContentInfo()->currentVersionNo,
+            'parentLocationId' => $event->getLocation()->parentLocationId,
+            'contentId' => $event->getLocation()->contentId,
         ];
 
         $this->auditService->log($this);

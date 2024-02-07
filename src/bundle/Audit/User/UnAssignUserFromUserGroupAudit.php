@@ -3,21 +3,26 @@
 namespace Edgar\EzUIAuditBundle\Audit\User;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\User\UnAssignUserFromUserGroupEvent;
 
 class UnAssignUserFromUserGroupAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\UserService\UnAssignUserFromUserGroupSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            UnAssignUserFromUserGroupEvent::class => ['onUnAssignUserFromUserGroup', 0],
+        ];
+    }
+
+    public function onUnAssignUserFromUserGroup(UnAssignUserFromUserGroupEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'userGroupId' => $signal->userGroupId,
-            'userId' => $signal->userId,
+            'userGroupId' => $event->getUserGroup()->id,
+            'userId' => $event->getUser()->getUserId(),
         ];
 
         $this->auditService->log($this);

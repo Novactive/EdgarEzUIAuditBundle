@@ -2,27 +2,29 @@
 
 namespace Edgar\EzUIAuditBundle\Audit\Content;
 
+use Ibexa\Contracts\Core\Repository\Events\Content\CopyContentEvent;
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
 
 class CopyContentAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\ContentService\CopyContentSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            CopyContentEvent::class => ['onCopyContent', 0],
+        ];
+    }
+
+    public function onCopyContent(CopyContentEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'dstContentId' => $signal->dstContentId,
-            'srcContentId' => $signal->srcContentId,
-            'srcVersionNo' => $signal->srcVersionNo,
-            'dstParentLocationId' => $signal->dstParentLocationId,
-            'dstVersionNo' => $signal->dstVersionNo,
+            'srcContentId' => $event->getContent()->id,
+            'srcVersionNo' => $event->getContent()->getVersionInfo()->versionNo,
+            'dstParentLocationId' => $event->getDestinationLocationCreateStruct()->parentLocationId,
         ];
-
         $this->auditService->log($this);
     }
 }

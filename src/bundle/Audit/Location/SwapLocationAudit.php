@@ -3,25 +3,30 @@
 namespace Edgar\EzUIAuditBundle\Audit\Location;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\Location\SwapLocationEvent;
 
 class SwapLocationAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\LocationService\SwapLocationSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            SwapLocationEvent::class => ['onSwapLocation', 0],
+        ];
+    }
+
+    public function onSwapLocation(SwapLocationEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'content1Id' => $signal->content1Id,
-            'content2Id' => $signal->content2Id,
-            'location1Id' => $signal->location1Id,
-            'location2Id' => $signal->location2Id,
-            'parentLocation1Id' => $signal->parentLocation1Id,
-            'parentLocation2Id' => $signal->parentLocation2Id,
+            'content1Id' => $event->getLocation1()->contentId,
+            'content2Id' => $event->getLocation2()->contentId,
+            'location1Id' => $event->getLocation1()->id,
+            'location2Id' => $event->getLocation2()->id,
+            'parentLocation1Id' => $event->getLocation1()->parentLocationId,
+            'parentLocation2Id' => $event->getLocation2()->parentLocationId,
         ];
 
         $this->auditService->log($this);

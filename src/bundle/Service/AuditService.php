@@ -2,7 +2,7 @@
 
 namespace Edgar\EzUIAuditBundle\Service;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\ORMException;
 use Doctrine\ORM\QueryBuilder;
 use Edgar\EzUIAudit\Audit\AuditInterface;
@@ -17,14 +17,14 @@ use Edgar\EzUIAudit\Repository\EdgarEzAuditLogRepository;
 use Edgar\EzUIAuditBundle\Entity\EdgarEzAuditConfiguration;
 use Edgar\EzUIAuditBundle\Entity\EdgarEzAuditExport;
 use Edgar\EzUIAuditBundle\Entity\EdgarEzAuditLog;
-use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class AuditService
 {
     /** @var AuditHandler */
     protected $auditHandler;
 
-    /** @var TokenStorage */
+    /** @var TokenStorageInterface */
     protected $tokenStorage;
 
     /** @var EdgarEzAuditConfigurationRepository */
@@ -40,13 +40,13 @@ class AuditService
      * AuditService constructor.
      *
      * @param AuditHandler $auditHandler
-     * @param Registry $doctrineRegistry
+     * @param ManagerRegistry $doctrineRegistry
      * @param TokenStorage $tokenStorage
      */
     public function __construct(
         AuditHandler $auditHandler,
-        Registry $doctrineRegistry,
-        TokenStorage $tokenStorage
+        ManagerRegistry $doctrineRegistry,
+        TokenStorageInterface $tokenStorage
     ) {
         $this->auditHandler = $auditHandler;
         $this->tokenStorage = $tokenStorage;
@@ -80,7 +80,6 @@ class AuditService
     public function loadAuditTypes(string $auditTypeGroup): array
     {
         $audits = $this->auditHandler->getAudits();
-
         $return = [];
         foreach ($audits[$auditTypeGroup] as $audit) {
             $classInfos = explode('\\', get_class($audit));

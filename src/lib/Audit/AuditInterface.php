@@ -6,7 +6,7 @@ use eZ\Publish\Core\SignalSlot\Signal;
 
 interface AuditInterface
 {
-    public function receive(Signal $signal);
+    public static function getSubscribedEvents();
 
     public function getInfos(): array;
 

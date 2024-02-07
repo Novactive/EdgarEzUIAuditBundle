@@ -3,20 +3,20 @@
 namespace Edgar\EzUIAudit\Form\Mapper;
 
 use Edgar\EzUIAudit\Repository\EdgarEzAuditExportRepository;
-use eZ\Publish\API\Repository\Exceptions\NotFoundException;
-use eZ\Publish\API\Repository\UserService;
+use Ibexa\Contracts\Core\Repository\Exceptions\NotFoundException;
+use Ibexa\Contracts\Core\Repository\UserService;
 use Pagerfanta\Pagerfanta;
-use Symfony\Component\Translation\Translator;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class PagerContentToExportMapper
 {
     /** @var UserService */
     private $userService;
 
-    /** @var Translator */
+    /** @var TranslatorInterface */
     private $translator;
 
-    public function __construct(UserService $userService, Translator $translator)
+    public function __construct(UserService $userService, TranslatorInterface $translator)
     {
         $this->userService = $userService;
         $this->translator = $translator;

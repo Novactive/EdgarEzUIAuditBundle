@@ -3,24 +3,35 @@
 namespace Edgar\EzUIAuditBundle\Audit\Location;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\Location\DeleteLocationEvent;
 
 class DeleteLocationAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\LocationService\DeleteLocationSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
-            return;
-        }
-
-        $this->infos = [
-            'parentLocationId' => $signal->parentLocationId,
-            'locationId' => $signal->locationId,
-            'contentId' => $signal->contentId,
+        return [
+            DeleteLocationEvent::class => ['onDeleteLocation', 0],
         ];
+    }
 
-        $this->auditService->log($this);
+    public function onDeleteLocation(DeleteLocationEvent $event): void
+    {
+        try {
+            if (!$this->auditService->isConfigured(self::class)) {
+                return;
+            }
+
+            $this->infos = [
+                'parentLocationId' => $event->getLocation()->parentLocationId,
+                'locationId' => $event->getLocation()->id,
+                'contentId' => $event->getLocation()->contentId,
+            ];
+            $this->auditService->log($this);
+            dd("EEEEEEEEEE",$this);
+
+        }
+        catch (\Exception $e){
+            dd($e->getMessage());
+        }
     }
 }

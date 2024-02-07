@@ -3,23 +3,27 @@
 namespace Edgar\EzUIAuditBundle\Audit\Content;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\Content\DeleteTranslationEvent;
 
 class DeleteTranslationAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\ContentService\DeleteTranslationSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            DeleteTranslationEvent::class => ['onDeleteTranslation', 0],
+        ];
+    }
+
+    public function onDeleteTranslation(DeleteTranslationEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'contentId' => $signal->contentId,
-            'languageCode' => $signal->languageCode,
+            'contentId' => $event->getContentInfo()->id,
+            'languageCode' => $event->getLanguageCode(),
         ];
-
         $this->auditService->log($this);
     }
 }

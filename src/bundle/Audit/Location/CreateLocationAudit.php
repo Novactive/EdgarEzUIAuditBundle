@@ -3,22 +3,27 @@
 namespace Edgar\EzUIAuditBundle\Audit\Location;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\Location\CreateLocationEvent;
 
 class CreateLocationAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\LocationService\CreateLocationSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            CreateLocationEvent::class => ['onCreateLocation', 0],
+        ];
+    }
+
+    public function onCreateLocation(CreateLocationEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'contentId' => $signal->contentId,
-            'locationId' => $signal->locationId,
-            'parentLocationId' => $signal->parentLocationId,
+            'contentId' => $event->getLocation()->contentId,
+            'locationId' => $event->getLocation()->id,
+            'parentLocationId' => $event->getLocation()->parentLocationId,
         ];
 
         $this->auditService->log($this);

@@ -3,23 +3,27 @@
 namespace Edgar\EzUIAuditBundle\Audit\ContentType;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\ContentType\UpdateFieldDefinitionEvent;
 
 class UpdateFieldDefinitionAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\ContentTypeService\UpdateFieldDefinitionSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            UpdateFieldDefinitionEvent::class => ['onUpdateFieldDefinition', 0],
+        ];
+    }
+
+    public function onUpdateFieldDefinition(UpdateFieldDefinitionEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'contentTypeDraftId' => $signal->contentTypeDraftId,
-            'fieldDefinitionId' => $signal->fieldDefinitionId,
+            'contentTypeDraftId' => $event->getContentTypeDraft()->id,
+            'fieldDefinitionId' => $event->getFieldDefinition()->id,
         ];
-
         $this->auditService->log($this);
     }
 }

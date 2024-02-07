@@ -1,43 +1,40 @@
-{% extends 'EzPlatformAdminUiBundle::layout.html.twig' %}
-
-{% form_theme form_configure_audit '@EzPlatformAdminUi/form_fields.html.twig'  %}
+{% extends '@ibexadesign/ui/layout.html.twig' %}
 
 {% trans_default_domain 'edgarezuiaudit' %}
-
-{% block body_class %}{% endblock %}
-
+{% form_theme form_configure_audit '@ibexadesign/ui/form_fields.html.twig' %}
 {% block breadcrumbs %}
-    {% include '@EzPlatformAdminUi/parts/breadcrumbs.html.twig' with { items: [
+    {% include '@ibexadesign/ui/breadcrumbs.html.twig' with { items: [
         { value: 'breadcrumb.audit'|trans(domain='messages')|desc('Audit') , },
         { url: path('edgar.audit.configure'), value: 'configure.breadcrumb.view'|trans|desc('Configuration') },
     ]} %}
 {% endblock %}
-
-{% block page_title %}
-    {% include '@EzPlatformAdminUi/parts/page_title.html.twig' with {
+{% block header %}
+    {% include '@ibexadesign/ui/page_title.html.twig' with {
         title: 'configure.view.title'|trans|desc('Audit configuration'),
         iconName: 'filters'
     } %}
 {% endblock %}
 
-{% block content %}
-    {{ form_start(form_configure_audit, {'attr': {'class': 'configure-audit'}}) }}
 
-    <section class="container mt-4">
-        <div class="card ez-card">
-            <div class="card-body">
+{% block content %}
+    <section class="container ibexa-container">
+        {% set body_rows = [] %}
+        {{ form_start(form_configure_audit, {'attr': {'class': 'edgar-audit-form'}}) }}
+        <div class="input-group mb-3">
+            <div class="select-types">
                 {{ form_row(form_configure_audit.audit_types) }}
             </div>
+            <span class="input-group-btn save">
+                <button type="submit" class="btn btn-primary">
+                <svg class="ibexa-icon ibexa-icon--small">
+                    <use xlink:href="{{ asset('bundles/ibexaicons/img/all-icons.svg') }}#search"></use>
+                </svg>
+               {{ 'configure_audit.submit'|trans|desc('Submit') }}</button>
+            </span>
         </div>
 
-        <span class="input-group-btn">
-            <button type="submit" class="btn btn-primary">
-            <svg class="ez-icon ez-icon-search-button">
-                <use xlink:href="{{ asset('bundles/ezplatformadminui/img/ez-icons.svg') }}#search"></use>
-            </svg>
-            {{ 'configure_audit.submit'|trans|desc('Submit') }}</button>
-        </span>
-    </section>
 
-    {{ form_end(form_configure_audit) }}
+        {{ form_end(form_configure_audit) }}
+    </section>
 {% endblock %}
+

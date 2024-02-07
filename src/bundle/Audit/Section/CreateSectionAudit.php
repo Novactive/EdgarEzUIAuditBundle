@@ -3,20 +3,25 @@
 namespace Edgar\EzUIAuditBundle\Audit\Section;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\Section\CreateSectionEvent;
 
 class CreateSectionAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\SectionService\CreateSectionSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            CreateSectionEvent::class => ['onCreateSection', 0],
+        ];
+    }
+
+    public function onCreateSection(CreateSectionEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'sectionId' => $signal->sectionId,
+            'sectionId' => $event->getSection()->id,
         ];
 
         $this->auditService->log($this);

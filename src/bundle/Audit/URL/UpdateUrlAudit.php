@@ -3,20 +3,25 @@
 namespace Edgar\EzUIAuditBundle\Audit\URL;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\URL\UpdateUrlEvent;
 
 class UpdateUrlAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\URLService\UpdateUrlSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            UpdateUrlEvent::class => ['onUpdateUrl', 0],
+        ];
+    }
+
+    public function onUpdateUrl(UpdateUrlEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'urlId' => $signal->urlId,
+            'urlId' => $event->getUrl()->id,
         ];
 
         $this->auditService->log($this);

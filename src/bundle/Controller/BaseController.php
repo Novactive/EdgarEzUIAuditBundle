@@ -3,11 +3,11 @@
 namespace Edgar\EzUIAuditBundle\Controller;
 
 use Edgar\EzUIAuditBundle\Service\AuditService;
-use eZ\Publish\API\Repository\PermissionResolver;
-use EzSystems\EzPlatformAdminUi\Notification\NotificationHandlerInterface;
-use EzSystems\EzPlatformAdminUiBundle\Controller\Controller;
+use Ibexa\Contracts\Core\Repository\PermissionResolver;
+use Ibexa\AdminUi\Notification\FlashBagNotificationHandler;
+use Ibexa\Contracts\AdminUi\Controller\Controller;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 abstract class BaseController extends Controller
 {
@@ -17,7 +17,7 @@ abstract class BaseController extends Controller
     /** @var PermissionResolver */
     protected $permissionResolver;
 
-    /** @var NotificationHandlerInterface */
+    /** @var FlashBagNotificationHandler */
     protected $notificationHandler;
 
     /** @var TranslatorInterface */
@@ -28,13 +28,13 @@ abstract class BaseController extends Controller
      *
      * @param AuditService $auditService
      * @param PermissionResolver $permissionResolver
-     * @param NotificationHandlerInterface $notificationHandler
+     * @param FlashBagNotificationHandler $notificationHandler
      * @param TranslatorInterface $translator
      */
     public function __construct(
         AuditService $auditService,
         PermissionResolver $permissionResolver,
-        NotificationHandlerInterface $notificationHandler,
+        FlashBagNotificationHandler $notificationHandler,
         TranslatorInterface $translator
     ) {
         $this->auditService = $auditService;

@@ -3,20 +3,25 @@
 namespace Edgar\EzUIAuditBundle\Audit\Language;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\Language\DisableLanguageEvent;
 
 class DisableLanguageAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\LanguageService\DisableLanguageSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            DisableLanguageEvent::class => ['onDisableLanguage', 0],
+        ];
+    }
+
+    public function onDisableLanguage(DisableLanguageEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'languageId' => $signal->languageId,
+            'languageId' => $event->getLanguage()->id,
         ];
 
         $this->auditService->log($this);

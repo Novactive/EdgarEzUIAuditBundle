@@ -3,23 +3,28 @@
 namespace Edgar\EzUIAuditBundle\Audit\Trash;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\Trash\TrashEvent;
 
 class TrashAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\TrashService\TrashSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            TrashEvent::class => ['onTrash', 0],
+        ];
+    }
+
+    public function onTrash(TrashEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'contentId' => $signal->contentId,
-            'locationId' => $signal->locationId,
-            'parentLocationId' => $signal->parentLocationId,
-            'contentTrashed' => $signal->contentTrashed,
+            'contentId' => $event->getTrashItem()->contentId,
+            'locationId' => $event->getLocation()->id,
+            'parentLocationId' => $event->getLocation()->parentLocationId,
+            'contentTrashed' => $event->getTrashItem()->getContent(),
         ];
 
         $this->auditService->log($this);

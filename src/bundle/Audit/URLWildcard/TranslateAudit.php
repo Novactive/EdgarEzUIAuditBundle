@@ -3,20 +3,25 @@
 namespace Edgar\EzUIAuditBundle\Audit\URLWildcard;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\URLWildcard\TranslateEvent;
 
 class TranslateAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\URLWildcardService\TranslateSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            TranslateEvent::class => ['onTranslateEvent', 0],
+        ];
+    }
+
+    public function onTranslateEvent(TranslateEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'url' => $signal->url,
+            'url' => $event->getUrl(),
         ];
 
         $this->auditService->log($this);

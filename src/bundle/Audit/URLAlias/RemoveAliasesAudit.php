@@ -3,15 +3,20 @@
 namespace Edgar\EzUIAuditBundle\Audit\URLAlias;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\URLAlias\RemoveAliasesEvent;
 
 class RemoveAliasesAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\URLAliasService\RemoveAliasesSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            RemoveAliasesEvent::class => ['onRemoveAliases', 0],
+        ];
+    }
+
+    public function onRemoveAliases(RemoveAliasesEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 

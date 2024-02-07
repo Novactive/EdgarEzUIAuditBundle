@@ -15,7 +15,7 @@ class ConfigureAuditType extends AbstractType
                 'audit_types',
                 AuditTypeChoiceType::class,
                 [
-                    'label' => 'Signals',
+                    'label' => 'Events',
                     'multiple' => true,
                     'expanded' => false,
                 ]

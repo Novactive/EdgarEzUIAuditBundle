@@ -3,20 +3,25 @@
 namespace Edgar\EzUIAuditBundle\Audit\Role;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\Role\PublishRoleDraftEvent;
 
 class PublishRoleDraftAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\RoleService\PublishRoleDraftSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            PublishRoleDraftEvent::class => ['onPublishRoleDraft', 0],
+        ];
+    }
+
+    public function onPublishRoleDraft(PublishRoleDraftEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'roleId' => $signal->roleId,
+            'roleId' => $event->getRoleDraft()->id,
         ];
 
         $this->auditService->log($this);

@@ -3,22 +3,26 @@
 namespace Edgar\EzUIAuditBundle\Audit\Content;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\Content\UpdateContentMetadataEvent;
 
 class UpdateContentMetadataAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\ContentService\UpdateContentMetadataSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            UpdateContentMetadataEvent::class => ['onUpdateContentMetadata', 0],
+        ];
+    }
+
+    public function onUpdateContentMetadata(UpdateContentMetadataEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'contentId' => $signal->contentId,
+            'contentId' => $event->getContent()->id,
         ];
-
         $this->auditService->log($this);
     }
 }

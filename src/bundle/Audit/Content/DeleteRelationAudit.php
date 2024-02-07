@@ -3,24 +3,28 @@
 namespace Edgar\EzUIAuditBundle\Audit\Content;
 
 use Edgar\EzUIAudit\Audit\AbstractAudit;
-use eZ\Publish\Core\SignalSlot\Signal;
+use Ibexa\Contracts\Core\Repository\Events\Content\DeleteRelationEvent;
 
 class DeleteRelationAudit extends AbstractAudit
 {
-    public function receive(Signal $signal)
+    public static function getSubscribedEvents()
     {
-        if (!$signal instanceof Signal\ContentService\DeleteRelationSignal
-            || !$this->auditService->isConfigured(self::class)
-        ) {
+        return [
+            DeleteRelationEvent::class => ['onDeleteRelation', 0],
+        ];
+    }
+
+    public function onDeleteRelation(DeleteRelationEvent $event): void
+    {
+        if (!$this->auditService->isConfigured(self::class)) {
             return;
         }
 
         $this->infos = [
-            'srcVersionNo' => $signal->srcVersionNo,
-            'srcContentId' => $signal->srcContentId,
-            'dstContentId' => $signal->dstContentId,
+            'srcVersionNo' => $event->getSourceVersion()->versionNo,
+            'srcContentId' => $event->getSourceVersion()->contentInfo->id,
+            'dstContentId' => $event->getDestinationContent()->id,
         ];
-
         $this->auditService->log($this);
     }
 }

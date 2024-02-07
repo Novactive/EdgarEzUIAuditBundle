@@ -9,13 +9,13 @@ use Edgar\EzUIAudit\Form\Factory\FormFactory;
 use Edgar\EzUIAudit\Form\Mapper\PagerContentToLogMapper;
 use Edgar\EzUIAudit\Form\SubmitHandler;
 use Edgar\EzUIAuditBundle\Service\AuditService;
-use eZ\Publish\API\Repository\PermissionResolver;
-use EzSystems\EzPlatformAdminUi\Notification\NotificationHandlerInterface;
+use Ibexa\Contracts\Core\Repository\PermissionResolver;
+use Ibexa\AdminUi\Notification\FlashBagNotificationHandler;
 use Pagerfanta\Adapter\DoctrineORMAdapter;
 use Pagerfanta\Pagerfanta;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class AuditDashboardController extends BaseController
 {
@@ -34,7 +34,7 @@ class AuditDashboardController extends BaseController
     /** @var PermissionResolver */
     protected $permissionResolver;
 
-    /** @var NotificationHandlerInterface */
+    /** @var FlashBagNotificationHandler */
     protected $notificationHandler;
 
     /** @var TranslatorInterface */
@@ -51,7 +51,7 @@ class AuditDashboardController extends BaseController
      * @param SubmitHandler $submitHandler
      * @param AuditService $auditService
      * @param PermissionResolver $permissionResolver
-     * @param NotificationHandlerInterface $notificationHandler
+     * @param FlashBagNotificationHandler $notificationHandler
      * @param TranslatorInterface $translator
      * @param PagerContentToLogMapper $pagerContentToLogMapper
      */
@@ -61,7 +61,7 @@ class AuditDashboardController extends BaseController
         SubmitHandler $submitHandler,
         AuditService $auditService,
         PermissionResolver $permissionResolver,
-        NotificationHandlerInterface $notificationHandler,
+        FlashBagNotificationHandler $notificationHandler,
         TranslatorInterface $translator,
         PagerContentToLogMapper $pagerContentToLogMapper
     ) {
