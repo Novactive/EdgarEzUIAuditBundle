@@ -13,11 +13,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Edgar\EzUIAudit\Repository\EdgarEzAuditExportRepository;
 
 class AuditExportAllRequests extends AbstractCron
 {
     const EXPORT_DIR = '_export';
-    /** @var EdgarRepository */
+    /** @var EdgarEzAuditExportRepository */
     private $exportRepository;
     /** @var AuditService */
     private $auditService;
