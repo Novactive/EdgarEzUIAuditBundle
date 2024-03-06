@@ -17,6 +17,7 @@ use Edgar\EzUIAudit\Repository\EdgarEzAuditLogRepository;
 use Edgar\EzUIAuditBundle\Entity\EdgarEzAuditConfiguration;
 use Edgar\EzUIAuditBundle\Entity\EdgarEzAuditExport;
 use Edgar\EzUIAuditBundle\Entity\EdgarEzAuditLog;
+use Ibexa\Contracts\Core\SiteAccess\ConfigResolverInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 class AuditService
@@ -36,17 +37,20 @@ class AuditService
     /** @var EdgarEzAuditExportRepository */
     protected $auditExport;
 
+    /** @var ConfigResolverInterface */
+    protected $configResolver;
+
     /**
-     * AuditService constructor.
-     *
      * @param AuditHandler $auditHandler
      * @param ManagerRegistry $doctrineRegistry
-     * @param TokenStorage $tokenStorage
+     * @param TokenStorageInterface $tokenStorage
+     * @param ConfigResolverInterface $configResolver
      */
     public function __construct(
         AuditHandler $auditHandler,
         ManagerRegistry $doctrineRegistry,
-        TokenStorageInterface $tokenStorage
+        TokenStorageInterface $tokenStorage,
+        ConfigResolverInterface $configResolver
     ) {
         $this->auditHandler = $auditHandler;
         $this->tokenStorage = $tokenStorage;
@@ -54,6 +58,7 @@ class AuditService
         $this->auditConfiguration = $entityManager->getRepository(EdgarEzAuditConfiguration::class);
         $this->auditLog = $entityManager->getRepository(EdgarEzAuditLog::class);
         $this->auditExport = $entityManager->getRepository(EdgarEzAuditExport::class);
+        $this->configResolver = $configResolver;
     }
 
     /**
@@ -219,5 +224,13 @@ class AuditService
             $this->auditExport->save($data, $apiUser->id);
         } catch (ORMException $e) {
         }
+
+    }
+    
+    public function getSetting(string $name): ?string
+    {
+        return $this->configResolver->hasParameter($name)
+            ? $this->configResolver->getParameter($name)
+            : null;
     }
 }

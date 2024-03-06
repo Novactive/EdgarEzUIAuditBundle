@@ -34,16 +34,12 @@ class AuditExportAllRequests extends AbstractCron
     /**
      * @param AuditService $auditService
      * @param string $kernelRootDir
-     * @param string $varDir
-     * @param string $storageDir
      * @param EntityManagerInterface $em
      * @param $name
      */
     public function __construct(
         AuditService $auditService,
         string $kernelRootDir,
-        string $varDir,
-        string $storageDir,
         EntityManagerInterface $em,
         $name = null
     ) {
@@ -52,8 +48,8 @@ class AuditExportAllRequests extends AbstractCron
         $this->exportRepository = $em->getRepository(EdgarEzAuditExport::class);
         $this->auditService     = $auditService;
         $this->kernelRootDir    = $kernelRootDir;
-        $this->varDir           = $varDir;
-        $this->storageDir       = $storageDir;
+        $this->varDir           = $this->auditService->getSetting('var_dir');
+        $this->storageDir       = $this->auditService->getSetting('storage_dir');
     }
     /**
      * Configure cron.
@@ -95,7 +91,7 @@ class AuditExportAllRequests extends AbstractCron
                     $data[] = $arrayRow;
                 }
                 $now = new \DateTime();
-                $exportDir = $this->kernelRootDir.'/../web/'.$this->varDir.'/'.$this->storageDir.'/'.self::EXPORT_DIR;
+                $exportDir = $this->kernelRootDir . '/public/' . $this->varDir . '/' . $this->storageDir . '/' . self::EXPORT_DIR;
                 if (!is_dir($exportDir)) {
                     if (!@mkdir($exportDir, 0777, true)) {
                         $output->writeln('Fail to create export directory');
