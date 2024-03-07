@@ -171,18 +171,17 @@ class AuditService
     }
 
     /**
-     * Log audit informations.
-     *
      * @param AuditInterface $audit
+     * @return void
      */
     public function log(AuditInterface $audit)
     {
-        $user = $this->tokenStorage->getToken()->getUser() ?? null;
-        $apiUser = $user->getAPIUser() ?? null;
-
         try {
+            $user = $this->tokenStorage->getToken()->getUser() ?? null;
+            $apiUser = $user->getAPIUser() ?? null;
             $this->auditLog->log($apiUser->id ?? 0, $audit->getGroup(), $audit->getIdentifier(), $audit->getName(), $audit->getInfos());
         } catch (ORMException $e) {
+        } catch (\Error $e) {
         }
     }
 
