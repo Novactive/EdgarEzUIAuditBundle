@@ -1,7 +1,6 @@
 {% extends '@ibexadesign/ui/layout.html.twig' %}
 
 {% trans_default_domain 'edgarezuiaudit' %}
-{% form_theme form_configure_audit '@ibexadesign/ui/form_fields.html.twig' %}
 {% block breadcrumbs %}
     {% include '@ibexadesign/ui/breadcrumbs.html.twig' with { items: [
         { value: 'breadcrumb.audit'|trans(domain='messages')|desc('Audit') , },
