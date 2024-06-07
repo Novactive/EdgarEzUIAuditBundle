@@ -23,8 +23,7 @@ class TrashAudit extends AbstractAudit
         $this->infos = [
             'contentId' => $event->getTrashItem()->contentId,
             'locationId' => $event->getLocation()->id,
-            'parentLocationId' => $event->getLocation()->parentLocationId,
-            'contentTrashed' => $event->getTrashItem()->getContent(),
+            'parentLocationId' => $event->getLocation()->parentLocationId
         ];
 
         $this->auditService->log($this);
