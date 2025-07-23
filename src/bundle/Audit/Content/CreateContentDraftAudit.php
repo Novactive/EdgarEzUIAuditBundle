@@ -23,7 +23,7 @@ class CreateContentDraftAudit extends AbstractAudit
         $this->infos = [
             'contentId' => $event->getContentDraft()->id,
             'versionNo' => $event->getContentDraft()->versionInfo->versionNo,
-            'userId' => $event->getVersionInfo()->creatorId,
+            'userId' => $event->getContentDraft()->versionInfo->creatorId,
         ];
         $this->auditService->log($this);
     }

@@ -20,11 +20,16 @@ class AssignRoleToUserGroupAudit extends AbstractAudit
             return;
         }
 
-        $this->infos = [
+        $infos = [
             'roleId' => $event->getRole()->id,
             'userGroupId' => $event->getUserGroup()->id,
-            'roleLimitation identifier' => $event->getRoleLimitation()->getIdentifier(),
         ];
+
+        if ($event->getRoleLimitation()) {
+            $infos['roleLimitation identifier'] = $event->getRoleLimitation()->getIdentifier();
+        }
+
+        $this->infos = $infos;
 
         $this->auditService->log($this);
     }
